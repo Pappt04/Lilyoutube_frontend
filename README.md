@@ -1,59 +1,98 @@
-# LilyoutubeFrontend
+# 💻 Jutjubić Frontend Service (ISA 2025)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+Ovo je klijentska aplikacija za platformu Jutjubić, razvijena koristeći Angular. Glavna svrha ovog dela projekta je pružanje kompletnog korisničkog interfejsa (UI/UX), upravljanje stanjem aplikacije i komunikacija sa backend RESTful API-jem.
 
-## Development server
+Aplikacija je Single Page Application (SPA) koja pruža fluidno, brzo i bezbedno iskustvo pregleda videa.
 
-To start a local development server, run:
+## ✎ Autori
 
-```bash
-ng serve
+[Papp Tamás](https://github.com/Pappt04)
+
+[Apró Dorottya](https://github.com/adorottya)
+
+[Mikro Arsenijević](https://github.com/watenfragen)
+
+
+## 📺 Backend
+
+Backend za aplikaciju je dostupan [ovde](https://github.com/Pappt04/Lilyoutube_server)
+
+
+# 🚀 Arhitektura
+
+Frontend je organizovan kao Modularna i Feature-Driven Angular aplikacija. Ova struktura omogućava efikasno skaliranje, ponovnu upotrebu koda i podržava Lazy Loading za brže inicijalno učitavanje.
+
+Ključni Moduli i Direktorijumi:
+
+app/core/: Sadrži logiku koja se učitava samo jednom (npr. servisi za autentifikaciju, HTTP interceptori, globalni Guardovi).
+
+app/shared/: Sadrži komponente, direktive i pipe-ove koji se dele i ponovo koriste širom aplikacije (npr. navigacija, dugmad, kartice za video).
+
+app/features/: Sadrži glavne funkcionalnosti aplikacije, često implementirane kao Lazy-Loaded moduli:
+
+video/: Upravljanje listom videa, plejerom i komentarima.
+
+auth/: Stranice za prijavu i registraciju.
+
+user-profile/: Upravljanje profilom korisnika.
+
+app/models/: TypeScript interfejsi i klase koje odslikavaju DTO (Data Transfer Objects) primljene od backend-a.
+
+# 🛠️ Tehnološki Stek
+
+Platforma: Angular (v17+)
+
+Jezik: TypeScript
+
+Stilizovanje: CSS
+
+Upravljanje stanjem: RxJS
+
+HTTP komunikacija: Angular HttpClient
+
+# 📋 Preduslovi
+
+Pre pokretanja aplikacije, uverite se da imate instalirano sledeće:
+
+Node.js (preporučena LTS verzija)
+
+npm (Node Package Manager)
+
+Angular CLI (Globalna instalacija):
+
+npm install -g @angular/cli
+
+
+# ⚙️ Lokalno Pokretanje Projekta
+
+1. Kloniranje Repozitorijuma
+   
+```
+git clone https://github.com/Pappt04/Lilyoutube-frontend
+cd jutubic-isa/frontend
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+3. Konfiguracija Backend API-ja
 
-## Code scaffolding
+Frontend mora znati gde da pronađe backend servis. Proverite fajl ```src/environments/environment.ts``` i podesite apiUrl da odgovara adresi i portu na kojem se pokreće backend.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+export const environment = {
+    production: false,
+    apiUrl: 'http://localhost:8080/api'
+};
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+4. Pokretanje Aplikacije
 
-```bash
-ng generate --help
-```
+Pokrenite razvojni server. Aplikacija će se automatski rekompajlirati pri svakoj promeni koda.
 
-## Building
+```ng serve```
 
-To build the project run:
 
-```bash
-ng build
-```
+Aplikacija će biti dostupna u vašem pretraživaču na adresi: http://localhost:4200/.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+🔗 Povezivanje sa Backend-om
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Aplikacija komunicira sa Spring Boot backend-om isključivo preko RESTful API-ja. Koristi se HTTP Interceptor za automatsko dodavanje JWT (JSON Web Token) tokena uz svaki zaštićeni zahtev, kao i za globalno rukovanje greškama.
