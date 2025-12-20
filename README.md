@@ -6,11 +6,11 @@ Aplikacija je Single Page Application (SPA) koja pruža fluidno, brzo i bezbedno
 
 ## ✎ Autori
 
-[Papp Tamás](https://github.com/Pappt04)
+[Papp Tamás](https://github.com/Pappt04) Student 2
 
-[Apró Dorottya](https://github.com/adorottya)
+[Apró Dorottya](https://github.com/adorottya) Student 3
 
-[Mikro Arsenijević](https://github.com/watenfragen)
+[Mikro Arsenijević](https://github.com/watenfragen) Student 1
 
 
 ## 📺 Backend
@@ -69,7 +69,7 @@ npm install -g @angular/cli
    
 ```
 git clone https://github.com/Pappt04/Lilyoutube-frontend
-cd jutubic-isa/frontend
+cd Lilyoutube-frontend/frontend
 npm install
 ```
 
