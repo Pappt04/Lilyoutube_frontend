@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 @Component({
     selector: 'app-home',
     standalone: true,
-    template: '<h1>Welcome to LilYoutube!</h1>'
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.css'
 })
 export class HomeComponent { }

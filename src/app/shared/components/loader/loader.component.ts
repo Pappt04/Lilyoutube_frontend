@@ -6,6 +6,6 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [CommonModule],
     template: '<div class="loader">Loading...</div>',
-    styles: ['.loader { font-weight: bold; }']
+    styleUrl: './loader.component.css'
 })
 export class LoaderComponent { }
