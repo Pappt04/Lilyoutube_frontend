@@ -21,7 +21,7 @@
 .nav-brand .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #ff0000;
+  color: #9D3215;
   letter-spacing: -0.5px;
 }
 
@@ -58,7 +58,7 @@
   .navbar {
     padding: 1rem;
   }
-  
+
   .profile-btn span {
     display: none;
   }
