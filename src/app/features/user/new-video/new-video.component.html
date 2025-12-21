@@ -1,1 +1,103 @@
-<h1>iddk</h1>
+<div class="upload-container">
+    <div class="upload-card">
+        <h1>Create New Video</h1>
+        <p class="subtitle">Share your story with the world</p>
+
+        <form [formGroup]="videoForm" (ngSubmit)="onSubmit()" class="upload-form">
+            <!-- Title -->
+            <div class="form-group">
+                <label for="title">Title *</label>
+                <input type="text" id="title" formControlName="title"
+                    placeholder="Add a title that describes your video">
+                <div class="error"
+                    *ngIf="videoForm.get('title')?.touched && videoForm.get('title')?.errors?.['required']">
+                    Title is required.
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" formControlName="description" rows="4"
+                    placeholder="Tell viewers about your video"></textarea>
+                <div class="error"
+                    *ngIf="videoForm.get('description')?.touched && videoForm.get('description')?.errors?.['required']">
+                    Description is required.
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="form-group">
+                <label for="tags">Tags *</label>
+                <input type="text" id="tags" formControlName="tags"
+                    placeholder="e.g. music, gaming, vlog (comma separated)">
+                <div class="error"
+                    *ngIf="videoForm.get('tags')?.touched && videoForm.get('tags')?.errors?.['required']">
+                    Tags are required.
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label for="location">Location (Optional)</label>
+                <input type="text" id="location" formControlName="location" placeholder="Where was this video filmed?">
+            </div>
+
+            <div class="file-sections">
+                <!-- Thumbnail -->
+                <div class="form-group file-group">
+                    <label>Thumbnail *</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" (change)="onThumbnailChange($event)" accept="image/*" id="thumbnail-input"
+                            hidden #thumbInput>
+                        <button type="button" class="btn btn-outline" (click)="thumbInput.click()">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
+                                fill="currentColor">
+                                <path
+                                    d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0-33-23.5-56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L380-480 240-280Zm-40 80v-560 560Z" />
+                            </svg>
+                            Select Thumbnail
+                        </button>
+                        <span class="file-name" *ngIf="videoForm.get('thumbnail')?.value">{{
+                            videoForm.get('thumbnail')?.value.name }}</span>
+                    </div>
+                    <div class="error" *ngIf="thumbnailError">{{ thumbnailError }}</div>
+                    <div class="error"
+                        *ngIf="videoForm.get('thumbnail')?.touched && !videoForm.get('thumbnail')?.value && !thumbnailError">
+                        Thumbnail is required.
+                    </div>
+                </div>
+
+                <!-- Video File -->
+                <div class="form-group file-group">
+                    <label>Video File * (MP4, max 200MB)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" (change)="onVideoFileChange($event)" accept="video/mp4" id="video-input"
+                            hidden #videoInput>
+                        <button type="button" class="btn btn-outline" (click)="videoInput.click()">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
+                                fill="currentColor">
+                                <path
+                                    d="m380-300 280-180-280-180v360ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                            </svg>
+                            Select Video
+                        </button>
+                        <span class="file-name" *ngIf="videoForm.get('videoFile')?.value">{{
+                            videoForm.get('videoFile')?.value.name }}</span>
+                    </div>
+                    <div class="error" *ngIf="videoError">{{ videoError }}</div>
+                    <div class="error"
+                        *ngIf="videoForm.get('videoFile')?.touched && !videoForm.get('videoFile')?.value && !videoError">
+                        Video file is required.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-text" (click)="onCancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="videoForm.invalid && videoForm.touched">Upload
+                    Video</button>
+            </div>
+        </form>
+    </div>
+</div>
