@@ -30,4 +30,21 @@ export class PostService {
   createPost(videoData: VideoPost): Observable<any> {
     return this.http.post(`${this.baseUrl}/posts`, videoData);
   }
+
+  getVideoUrl(name: string): string {
+    return `${this.baseUrl}/media/videos/${name}`;
+  }
+
+  getThumbnailUrl(name: string): string {
+    return `${this.baseUrl}/media/thumbnails/${name}`;
+  }
+
+  getVideoBlob(name: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/media/videos/${name}`, { responseType: 'blob' });
+  }
+
+  getThumbnailBlob(name: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/media/thumbnails/${name}`, { responseType: 'blob' });
+  }
+
 }

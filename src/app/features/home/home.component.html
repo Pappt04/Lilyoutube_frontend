@@ -5,7 +5,8 @@
         @for (video of videos; track video.videoPath) {
         <div class="video-card">
             <div class="thumbnail">
-                <img [src]="video.thumbnailPath || '/images/default-thumbnail.jpg'" alt="{{ video.title }}">
+                <img [src]="getThumbnailUrl(video.thumbnailPath) || '/images/default_thumbnail.png'"
+                    alt="{{ video.title }}">
             </div>
             <div class="video-info">
                 <div class="video-avatar"></div>

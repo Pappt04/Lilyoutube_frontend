@@ -18,4 +18,9 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         this.videos$ = this.postService.getVideos();
     }
+
+    getThumbnailUrl(filename: string): string | null {
+        if (!filename) return null;
+        return this.postService.getThumbnailUrl(filename);
+    }
 }
