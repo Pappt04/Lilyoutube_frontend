@@ -1,0 +1,88 @@
+@if (video$ | async; as video) {
+<div class="video-page-container">
+    <div class="main-content">
+        <div class="video-section">
+            <div class="player-wrapper">
+                <video controls [src]="getVideoUrl(video.videoPath)" class="video-player">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <div class="video-info">
+                <h1 class="video-title">{{ video.title }}</h1>
+                <div class="video-actions">
+                    <div class="video-meta-detail">
+                        <div class="user-avatar"></div>
+                        <div class="user-info">
+                            <span class="username">User #{{ video.user_id }}</span>
+                            <span class="subscribers">1.2M subscribers</span>
+                        </div>
+                        <button class="subscribe-btn">Subscribe</button>
+                    </div>
+
+                    <div class="interaction-buttons">
+                        <button class="action-btn like-btn" [class.active]="liked" (click)="toggleLike()">
+                            <span class="icon">👍</span> {{ currentLikes }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-description">
+                <div class="description-header">
+                    <span class="views">123K views</span>
+                    <span class="date">Uploaded recently</span>
+                    @for (tag of video.tags; track tag) {
+                    <span class="tag">#{{ tag }}</span>
+                    }
+                </div>
+                <p class="description-text">{{ video.description }}</p>
+                @if (video.location) {
+                <p class="location"><span class="icon">📍</span> {{ video.location }}</p>
+                }
+            </div>
+
+            <div class="comments-section">
+                <h3>{{ comments.length }} Comments</h3>
+                <div class="add-comment">
+                    <div class="user-avatar small"></div>
+                    <div class="comment-input-wrapper">
+                        <textarea #commentInput placeholder="Add a comment..." rows="1"></textarea>
+                        <div class="comment-btns">
+                            <button class="cancel-btn" (click)="commentInput.value = ''">Cancel</button>
+                            <button class="comment-btn" (click)="addComment(commentInput)">Comment</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comments-list">
+                    @for (comment of comments; track comment.date) {
+                    <div class="comment-item">
+                        <div class="user-avatar small"></div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-user">{{ comment.user }}</span>
+                                <span class="comment-date">{{ comment.date | date:'short' }}</span>
+                            </div>
+                            <p class="comment-text">{{ comment.text }}</p>
+                            <div class="comment-actions">
+                                <button class="action-btn small">👍</button>
+                                <button class="action-btn small">👎</button>
+                                <button class="action-btn small">Reply</button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+} @else {
+<div class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading video...</p>
+</div>
+}

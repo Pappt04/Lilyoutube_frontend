@@ -83,7 +83,9 @@ export class NewVideoComponent {
             tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
             location: this.videoForm.value.location,
             videoPath: videoFilename,
-            thumbnailPath: thumbnailFilename
+            thumbnailPath: thumbnailFilename,
+            commentsCount:0,
+            likesCount:0,
           };
 
           return this.postService.createPost(videoData);

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { VideoPlayerComponent } from './components/video-player/video-player.component';
+import { VideoPageComponent } from './components/video-page/video-page.component';
 
 const routes: Routes = [
-    { path: ':id', component: VideoPlayerComponent }
+    { path: ':id', component: VideoPageComponent }
 ];
 
 @NgModule({

@@ -15,6 +15,10 @@ export class PostService {
     return this.http.get<VideoPost[]>(`${this.baseUrl}/posts`);
   }
 
+  getPostById(id: string): Observable<VideoPost> {
+    return this.http.get<VideoPost>(`${this.baseUrl}/posts/${id}`);
+  }
+
   uploadVideoFile(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('file', file);
