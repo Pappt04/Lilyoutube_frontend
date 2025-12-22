@@ -2,6 +2,9 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PostService } from '../services/post.service';
+import { VideoPost } from '../../../domain/model/video-post.model';
+import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-new-video',
@@ -13,6 +16,7 @@ import { Router } from '@angular/router';
 export class NewVideoComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private postService = inject(PostService);
 
   videoForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -60,14 +64,41 @@ export class NewVideoComponent {
 
   onSubmit() {
     if (this.videoForm.valid) {
-      const formData = {
-        ...this.videoForm.value,
-        createdAt: new Date().toISOString()
-      };
-      console.log('Video data to upload:', formData);
-      // Here you would typically call a service to upload
-      alert('Video upload started! (Check console for data)');
-      this.router.navigate(['/my-channel']);
+      const videoFile = this.videoForm.get('videoFile')?.value;
+      const thumbnailFile = this.videoForm.get('thumbnail')?.value;
+
+      forkJoin({
+        videoPath: this.postService.uploadVideoFile(videoFile),
+        thumbnailPath: this.postService.uploadThumbnailFile(thumbnailFile)
+      }).pipe(
+        switchMap(({ videoPath, thumbnailPath }) => {
+          // Extract filenames if the response contains extra text (e.g. "Video uploaded successfully: <uuid>")
+          const videoFilename = videoPath.split(': ').pop() || videoPath;
+          const thumbnailFilename = thumbnailPath.split(': ').pop() || thumbnailPath;
+
+          const videoData: VideoPost = {
+            user_id: 1, // Temporarily hardcoded, should ideally come from an auth service
+            title: this.videoForm.value.title,
+            description: this.videoForm.value.description,
+            tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
+            location: this.videoForm.value.location,
+            videoPath: videoFilename,
+            thumbnailPath: thumbnailFilename
+          };
+
+          return this.postService.createPost(videoData);
+        })
+      ).subscribe({
+        next: (response) => {
+          console.log('Upload successful:', response);
+          alert('Video uploaded successfully!');
+          this.router.navigate(['/my-channel']);
+        },
+        error: (err: any) => {
+          console.error('Upload failed:', err);
+          alert('Failed to upload video. Please try again.');
+        }
+      });
     } else {
       this.videoForm.markAllAsTouched();
     }

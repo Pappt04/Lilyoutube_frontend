@@ -1,0 +1,33 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from "../../../../environments/environment";
+import { Observable } from 'rxjs';
+import { VideoPost } from '../../../domain/model/video-post.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PostService {
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
+
+  getVideos(): Observable<VideoPost[]> {
+    return this.http.get<VideoPost[]>(`${this.baseUrl}/posts`);
+  }
+
+  uploadVideoFile(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.baseUrl}/media/upload-video`, formData, { responseType: 'text' });
+  }
+
+  uploadThumbnailFile(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.baseUrl}/media/upload-picture`, formData, { responseType: 'text' });
+  }
+
+  createPost(videoData: VideoPost): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts`, videoData);
+  }
+}
