@@ -12,7 +12,12 @@
                 <div class="video-avatar"></div>
                 <div class="text-info">
                     <h3 class="video-title">{{ video.title }}</h3>
-                    <p class="video-meta">User #{{ video.user_id }} • {{ video.location || 'Unknown' }}</p>
+                    <p class="video-meta">
+                        <a [routerLink]="['/users', video.user_id]" (click)="$event.stopPropagation()" class="user-link">
+                            User #{{ video.user_id }}
+                        </a>
+                        • {{ video.location || 'Unknown' }}
+                    </p>
                 </div>
             </div>
         </div>

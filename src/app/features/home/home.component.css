@@ -56,8 +56,18 @@
      overflow: hidden;
  }
 
- .video-meta {
-     margin: 0;
-     font-size: 0.875rem;
-     color: #666;
- }
+.video-meta {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.user-link {
+    color: #065fd4;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.user-link:hover {
+    text-decoration: underline;
+}

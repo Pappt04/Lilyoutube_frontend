@@ -1,4 +1,5 @@
 export interface VideoPost {
+  id?: number;
   user_id: number;
   title: string;
   description: string;
@@ -8,4 +9,5 @@ export interface VideoPost {
   thumbnailPath: string;
   likesCount: number;
   commentsCount: number;
+  createdAt?: string;
 }
