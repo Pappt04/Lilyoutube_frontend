@@ -1,0 +1,24 @@
+<div class="home-container">
+    <h1>Recommended Videos</h1>
+    <div class="video-grid">
+        @if (videos$ | async; as videos) {
+        @for (video of videos; track video.videoPath) {
+        <div class="video-card" (click)="navigateToVideo(video.videoPath)">
+            <div class="thumbnail">
+                <img [src]="getThumbnailUrl(video.thumbnailPath) || '/images/default_thumbnail.png'"
+                    alt="{{ video.title }}">
+            </div>
+            <div class="video-info">
+                <div class="video-avatar"></div>
+                <div class="text-info">
+                    <h3 class="video-title">{{ video.title }}</h3>
+                    <p class="video-meta">User #{{ video.user_id }} • {{ video.location || 'Unknown' }}</p>
+                </div>
+            </div>
+        </div>
+        }
+        } @else {
+        <p>Loading videos...</p>
+        }
+    </div>
+</div>

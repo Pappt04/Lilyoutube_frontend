@@ -64,7 +64,8 @@
               "buildTarget": "lilyoutube-frontend:build:production"
             },
             "development": {
-              "buildTarget": "lilyoutube-frontend:build:development"
+              "buildTarget": "lilyoutube-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
