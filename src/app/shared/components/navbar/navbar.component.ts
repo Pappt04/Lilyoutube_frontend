@@ -1,25 +1,46 @@
-import {Component, inject, output} from '@angular/core';
-import {NgOptimizedImage} from '@angular/common';
-import {Router} from '@angular/router';
+import { Component, inject, output, PLATFORM_ID } from '@angular/core';
+import { NgIf, NgOptimizedImage, isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   templateUrl: './navbar.component.html',
-  imports: [
-    NgOptimizedImage
-  ],
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.css',
+  imports: [NgOptimizedImage, NgIf]
 })
 export class NavbarComponent {
-    private router = inject(Router);
-    openProfile = output<void>();
+  private router = inject(Router);
+  private auth = inject(AuthService);
+  private platformId = inject(PLATFORM_ID);
 
-    onProfileClick() {
-        this.openProfile.emit();
-    }
+  openProfile = output<void>();
 
-    onNavbarClick() {
-      this.router.navigate(['']);
-    }
+  isBrowser = isPlatformBrowser(this.platformId);
+
+  get isLoggedIn(): boolean {
+    return this.auth.isLoggedIn();
+  }
+
+  onProfileClick() {
+    this.openProfile.emit();
+  }
+
+  onNavbarClick() {
+    this.router.navigate(['']);
+  }
+
+  goToLogin() {
+    this.router.navigate(['/user/login']);
+  }
+
+  goToRegister() {
+    this.router.navigate(['/user/register']);
+  }
+
+  onLogoutClick() {
+    this.auth.logout();
+    this.router.navigate(['']);
+  }
 }

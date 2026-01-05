@@ -1,0 +1,32 @@
+<h1>Login</h1>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div>
+    <label>Email</label>
+    <input type="email" formControlName="email" />
+    <small *ngIf="form.get('email')?.touched && form.get('email')?.invalid" style="color: red">
+      Unesi ispravan email.
+    </small>
+  </div>
+
+  <div>
+    <label>Lozinka</label>
+    <input type="password" formControlName="password" />
+    <small *ngIf="form.get('password')?.touched && form.get('password')?.invalid" style="color: red">
+      Lozinka je obavezna.
+    </small>
+  </div>
+
+
+  <button type="submit" [disabled]="loading">
+    {{ loading ? 'Ulogovanje...' : 'Uloguj se' }}
+  </button>
+
+  <p *ngIf="errorMsg" style="color: red; margin-top: 8px;">
+    {{ errorMsg }}
+  </p>
+
+  <p style="margin-top: 12px;">
+    Nemaš nalog? <a routerLink="/user/register">Registruj se</a>
+  </p>
+</form>

@@ -3,10 +3,19 @@ import { HomeComponent } from './features/home/home.component';
 import { MyChannelComponent } from './features/user/my-channel/my-channel.component';
 import { NewVideoComponent } from './features/user/new-video/new-video.component';
 import { VideoPageComponent } from './features/video/components/video-page/video-page.component';
+import { LoginComponent } from './features/user/pages/login/login.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'my-channel', component: MyChannelComponent },
     { path: 'my-channel/new-video', component: NewVideoComponent },
     { path: 'videos/:id', component: VideoPageComponent },
+    { path: 'user/login', component: LoginComponent },
+
+    {
+    path: 'user/register',
+    loadComponent: () =>
+      import('./features/user/pages/register/register.component')
+        .then(m => m.RegisterComponent)
+    },
 ];

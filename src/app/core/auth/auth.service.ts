@@ -1,16 +1,56 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { LoginRequest, RegisterRequest } from './auth.models';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-    constructor() { }
+  private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
 
-    login() {
-        console.log('Login logic here');
-    }
+  private readonly api = environment.apiUrl;
+  private readonly tokenKey = 'auth_token';
 
-    logout() {
-        console.log('Logout logic here');
-    }
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  register(payload: RegisterRequest): Observable<string> {
+    return this.http.post(`${this.api}/auth/register`, payload, { responseType: 'text' });
+  }
+
+  activate(token: string): Observable<string> {
+    return this.http.get(`${this.api}/auth/activate`, {
+      params: { token },
+      responseType: 'text'
+    });
+  }
+
+  login(payload: LoginRequest): Observable<string> {
+    return this.http
+      .post(`${this.api}/auth/login`, payload, { responseType: 'text' as const })
+      .pipe(tap(token => this.setToken((token ?? '').trim())));
+  }
+
+  logout(): void {
+    if (!this.isBrowser) return;
+    window.localStorage.removeItem(this.tokenKey);
+  }
+
+  getToken(): string | null {
+    if (!this.isBrowser) return null;
+    return window.localStorage.getItem(this.tokenKey);
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  private setToken(token: string) {
+    if (!this.isBrowser) return;
+    if (!token) return;
+    window.localStorage.setItem(this.tokenKey, token);
+  }
 }

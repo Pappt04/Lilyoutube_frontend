@@ -1,0 +1,7 @@
+<h2>Aktivacija naloga</h2>
+
+<p *ngIf="loading">Aktiviram...</p>
+<p *ngIf="message" style="color: green">{{ message }}</p>
+<p *ngIf="error" style="color: red">{{ error }}</p>
+
+<a routerLink="/user/login">Idi na login</a>
