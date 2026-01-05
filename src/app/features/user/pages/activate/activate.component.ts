@@ -8,6 +8,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './activate.component.html',
+  styleUrl: './activate.component.css'
 })
 export class ActivateComponent {
   private route = inject(ActivatedRoute);

@@ -13,6 +13,7 @@ import { RegisterRequest } from '../../../../core/auth/auth.models';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
+  styleUrl: './register.component.css'
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

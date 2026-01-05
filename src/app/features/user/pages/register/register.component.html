@@ -1,74 +1,77 @@
-<h2>Registracija</h2>
+<div class="register-container">
+  <div class="register-card">
+    <h2>Registracija</h2>
 
-<form [formGroup]="form" (ngSubmit)="submit()">
-  <div>
-    <label>Email</label>
-    <input formControlName="email" />
-    <small *ngIf="form.get('email')?.touched && form.get('email')?.invalid" style="color: red">
-      Unesi ispravan email.
-    </small>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Ime</label>
+          <input formControlName="firstName" placeholder="Petar" />
+          <small class="error-text" *ngIf="form.get('firstName')?.touched && form.get('firstName')?.invalid">
+            Ime je obavezno.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Prezime</label>
+          <input formControlName="lastName" placeholder="Petrović" />
+          <small class="error-text" *ngIf="form.get('lastName')?.touched && form.get('lastName')?.invalid">
+            Prezime je obavezno.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="primer@email.com" />
+          <small class="error-text" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+            Unesi ispravan email.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Korisničko ime</label>
+          <input formControlName="username" placeholder="korisnik123" />
+          <small class="error-text" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+            Korisničko ime je obavezno.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Adresa</label>
+          <input formControlName="address" placeholder="Ulica i broj" />
+          <small class="error-text" *ngIf="form.get('address')?.touched && form.get('address')?.invalid">
+            Adresa je obavezna.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Lozinka</label>
+          <input type="password" formControlName="password" />
+          <small class="error-text" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+            Minimum 6 karaktera.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Potvrdi lozinku</label>
+          <input type="password" formControlName="confirmPassword" />
+          <small class="error-text"
+            *ngIf="form.get('confirmPassword')?.touched && (form.get('confirmPassword')?.invalid || form.getRawValue().password !== form.getRawValue().confirmPassword)">
+            Mora se poklopiti.
+          </small>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Slanje...' : 'Registruj se' }}
+      </button>
+
+      <div class="success-message" *ngIf="message">{{ message }}</div>
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+
+      <p class="footer-text">
+        Već imaš nalog? <a routerLink="/user/login">Uloguj se</a>
+      </p>
+    </form>
   </div>
-
-  <div>
-    <label>Korisničko ime</label>
-    <input formControlName="username" />
-    <small *ngIf="form.get('username')?.touched && form.get('username')?.invalid" style="color: red">
-      Korisničko ime je obavezno.
-    </small>
-  </div>
-
-  <div>
-    <label>Ime</label>
-    <input formControlName="firstName" />
-    <small *ngIf="form.get('firstName')?.touched && form.get('firstName')?.invalid" style="color: red">
-      Ime je obavezno.
-    </small>
-  </div>
-
-  <div>
-    <label>Prezime</label>
-    <input formControlName="lastName" />
-    <small *ngIf="form.get('lastName')?.touched && form.get('lastName')?.invalid" style="color: red">
-      Prezime je obavezno.
-    </small>
-  </div>
-
-  <div>
-    <label>Adresa</label>
-    <input formControlName="address" />
-    <small *ngIf="form.get('address')?.touched && form.get('address')?.invalid" style="color: red">
-      Adresa je obavezna.
-    </small>
-  </div>
-
-  <div>
-    <label>Lozinka</label>
-    <input type="password" formControlName="password" />
-    <small *ngIf="form.get('password')?.touched && form.get('password')?.invalid" style="color: red">
-      Lozinka mora imati minimum 6 karaktera.
-    </small>
-  </div>
-
-  <div>
-    <label>Potvrdi lozinku</label>
-    <input type="password" formControlName="confirmPassword" />
-    <small
-      *ngIf="form.get('confirmPassword')?.touched && (form.get('confirmPassword')?.invalid || form.getRawValue().password !== form.getRawValue().confirmPassword)"
-      style="color: red"
-    >
-      Potvrda lozinke je obavezna i mora se poklopiti.
-    </small>
-  </div>
-
-  <button type="submit" [disabled]="loading">
-    {{ loading ? 'Slanje...' : 'Registruj se' }}
-  </button>
-
-  <p *ngIf="message" style="color: green">{{ message }}</p>
-  <p *ngIf="error" style="color: red">{{ error }}</p>
-</form>
-
-<p>
-  Već imaš nalog?
-  <a routerLink="/user/login">Uloguj se</a>
-</p>
+</div>
