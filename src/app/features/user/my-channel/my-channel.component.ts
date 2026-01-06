@@ -16,6 +16,6 @@ export class MyChannelComponent {
   user = this.auth.currentUser;
 
   navigateToNewVideo() {
-    this.router.navigate(['/user/new-video']);
+    this.router.navigate(['/my-channel/new-video']);
   }
 }

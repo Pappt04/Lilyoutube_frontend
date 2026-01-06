@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PostService } from '../services/post.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { VideoPost } from '../../../domain/model/video-post.model';
+import { EMPTY } from 'rxjs';
 import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
@@ -17,6 +19,7 @@ export class NewVideoComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private postService = inject(PostService);
+  private authService = inject(AuthService);
 
   videoForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -67,30 +70,25 @@ export class NewVideoComponent {
       const videoFile = this.videoForm.get('videoFile')?.value;
       const thumbnailFile = this.videoForm.get('thumbnail')?.value;
 
-      forkJoin({
-        videoPath: this.postService.uploadVideoFile(videoFile),
-        thumbnailPath: this.postService.uploadThumbnailFile(thumbnailFile)
-      }).pipe(
-        switchMap(({ videoPath, thumbnailPath }) => {
-          // Extract filenames if the response contains extra text (e.g. "Video uploaded successfully: <uuid>")
-          const videoFilename = videoPath.split(': ').pop() || videoPath;
-          const thumbnailFilename = thumbnailPath.split(': ').pop() || thumbnailPath;
+      const user = this.authService.currentUser();
+      if (!user) {
+        alert('You must be logged in to upload a video.');
+        return;
+      }
 
-          const videoData: VideoPost = {
-            user_id: 1, // Temporarily hardcoded, should ideally come from an auth service
-            title: this.videoForm.value.title,
-            description: this.videoForm.value.description,
-            tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
-            location: this.videoForm.value.location,
-            videoPath: videoFilename,
-            thumbnailPath: thumbnailFilename,
-            commentsCount:0,
-            likesCount:0,
-          };
+      const videoData: VideoPost = {
+        user_id: Number(user.id),
+        title: this.videoForm.value.title,
+        description: this.videoForm.value.description,
+        tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
+        location: this.videoForm.value.location,
+        videoPath: '', // Will be set by server or handled in transactional flow
+        thumbnailPath: '', // Will be set by server or handled in transactional flow
+        commentsCount: 0,
+        likesCount: 0,
+      };
 
-          return this.postService.createPost(videoData);
-        })
-      ).subscribe({
+      this.postService.createPostWithFiles(videoData, videoFile, thumbnailFile).subscribe({
         next: (response) => {
           console.log('Upload successful:', response);
           alert('Video uploaded successfully!');

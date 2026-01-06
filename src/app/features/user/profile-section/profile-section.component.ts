@@ -21,7 +21,7 @@ export class ProfileSectionComponent {
     }
 
     navigateToMyChannel() {
-        this.router.navigate(['/user/my-channel']);
+        this.router.navigate(['/my-channel']);
         this.onClose();
     }
 

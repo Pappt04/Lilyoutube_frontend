@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../user/services/post.service';
 import { VideoPost } from '../../../../domain/model/video-post.model';
-import { Observable, switchMap, tap } from 'rxjs';
+import { User } from '../../../../domain/model/user.model';
+import { UserService } from '../../../user/services/user.service';
+import { Observable, switchMap, tap, of, catchError } from 'rxjs';
+import { SecureMediaPipe } from '../../../../shared/pipes/secure-media.pipe';
 
 interface Comment {
     user: string;
@@ -14,7 +17,7 @@ interface Comment {
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, SecureMediaPipe],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })
@@ -22,26 +25,46 @@ export class VideoPageComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private postService = inject(PostService);
+    private userService = inject(UserService);
 
     video$!: Observable<VideoPost>;
+    author$!: Observable<User | null>;
     liked = false;
     currentLikes = 0;
     comments: Comment[] = [];
+    private viewTracked = false;
+    private videoName: string | null = null;
+    private videoId: number | null = null;
 
     ngOnInit() {
         this.video$ = this.route.paramMap.pipe(
             switchMap(params => {
-                const id = params.get('id');
-                if (!id) {
+                this.videoName = params.get('id');
+                if (!this.videoName) {
                     this.router.navigate(['/home']);
                     throw new Error('No video ID provided');
                 }
-                return this.postService.getPostById(id);
+                return this.postService.getPostById(this.videoName);
             }),
-            tap(video => {
+            tap((video: VideoPost) => {
                 this.currentLikes = video.likesCount || 0;
+                this.author$ = this.userService.getUserById(video.user_id).pipe(
+                    catchError(() => of(null))
+                );
             })
         );
+    }
+
+    onVideoPlay() {
+        if (!this.viewTracked && this.videoName) {
+            this.postService.incrementViewCount(this.videoName).subscribe({
+                next: () => {
+                    this.viewTracked = true;
+                    console.log('View incremented');
+                },
+                error: (err: any) => console.error('Failed to increment view', err)
+            });
+        }
     }
 
     getVideoUrl(filename: string): string {

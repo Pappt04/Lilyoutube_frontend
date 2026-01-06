@@ -1,4 +1,5 @@
 export interface VideoPost {
+  id?: number;
   user_id: number;
   title: string;
   description: string;
@@ -6,6 +7,8 @@ export interface VideoPost {
   location: string;
   videoPath: string;
   thumbnailPath: string;
-  likesCount: number;
-  commentsCount: number;
+  likesCount?: number;
+  commentsCount?: number;
+  viewsCount?: number;
+  createdAt?: Date;
 }
