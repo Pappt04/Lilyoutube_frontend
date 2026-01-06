@@ -3,7 +3,8 @@
     <div class="main-content">
         <div class="video-section">
             <div class="player-wrapper">
-                <video controls [src]="getVideoUrl(video.videoPath) | secureMedia | async" class="video-player">
+                <video controls [src]="getVideoUrl(video.videoPath) | secureMedia | async" class="video-player"
+                    (play)="onVideoPlay()">
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -14,8 +15,12 @@
                     <div class="video-meta-detail">
                         <div class="user-avatar"></div>
                         <div class="user-info">
-                            <span class="username">User #{{ video.user_id }}</span>
-                            <span class="subscribers">1.2M subscribers</span>
+                            @if (author$ | async; as author) {
+                            <span class="username">{{ author.firstName }} {{ author.lastName }}</span>
+                            } @else {
+                            <span class="username">Loading user...</span>
+                            }
+                            <span class="subscribers">Unknown subscribers</span>
                         </div>
                         <button class="subscribe-btn">Subscribe</button>
                     </div>
@@ -30,8 +35,8 @@
 
             <div class="video-description">
                 <div class="description-header">
-                    <span class="views">123K views</span>
-                    <span class="date">Uploaded recently</span>
+                    <span class="views">{{ video.viewsCount || 0 }} views</span>
+                    <span class="date">{{ video.createdAt }}</span>
                     @for (tag of video.tags; track tag) {
                     <span class="tag">#{{ tag }}</span>
                     }

@@ -59,4 +59,8 @@ export class PostService {
     return this.http.get(`${this.baseUrl}/media/thumbnails/${name}`, { responseType: 'blob' });
   }
 
+  incrementViewCount(postId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts/${postId}/view`, {});
+  }
+
 }
