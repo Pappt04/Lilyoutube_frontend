@@ -15,15 +15,15 @@
                     </svg>
                 </div>
                 <div class="details">
-                    <p class="name">Guest User</p>
-                    <p class="email">guest(at)example.com</p>
+                    <p class="name">{{ user()?.firstName }} {{ user()?.lastName }}</p>
+                    <p class="email">{{ user()?.email }}</p>
                 </div>
             </div>
             <hr>
             <ul class="profile-menu">
                 <li (click)="navigateToMyChannel()">Your Channel</li>
                 <li>Settings</li>
-                <li>Sign Out</li>
+                <li (click)="onLogout()">Sign Out</li>
             </ul>
         </div>
     </div>

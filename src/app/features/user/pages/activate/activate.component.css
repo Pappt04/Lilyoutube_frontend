@@ -1,0 +1,66 @@
+.activate-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 64px);
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.activate-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.status-message {
+    margin: 20px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.loading {
+    color: #666;
+}
+
+.success {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.action-link {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 10px 20px;
+    background-color: #cc0000;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.action-link:hover {
+    background-color: #b30000;
+}
