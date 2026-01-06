@@ -8,7 +8,7 @@
 
   <div class="search-container" *ngIf="isBrowser">
     <div class="search-bar">
-      <input type="text" class="search-input" placeholder="Pretraži">
+      <input type="text" class="search-input" placeholder="Search">
       <button class="search-btn">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
           <path
@@ -30,10 +30,10 @@
           <path
             d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Z" />
         </svg>
-        <span>Profile</span>
+        <span>{{ user()?.username || 'Profile' }}</span>
       </button>
 
-      <button class="logout-btn" (click)="onLogoutClick()" title="Odjavi se">
+      <button class="logout-btn" (click)="onLogoutClick()" title="Log out">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
           <path
             d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />

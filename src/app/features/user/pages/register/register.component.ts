@@ -41,7 +41,7 @@ export class RegisterComponent {
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.error = 'Popuni sva obavezna polja ispravno.';
+      this.error = 'Please fill in all required fields correctly.';
       this.cdr.detectChanges();
       return;
     }
@@ -51,7 +51,7 @@ export class RegisterComponent {
     const confirmPassword = raw.confirmPassword ?? '';
 
     if (password !== confirmPassword) {
-      this.error = 'Lozinke se ne poklapaju.';
+      this.error = 'Passwords do not match.';
       this.cdr.detectChanges();
       return;
     }
@@ -79,8 +79,8 @@ export class RegisterComponent {
       )
       .subscribe({
         next: (txt) => {
-          // backend često vraća plain text
-          this.message = (typeof txt === 'string' ? txt : 'Registracija uspešna!');
+          // backend often returns plain text
+          this.message = (typeof txt === 'string' ? txt : 'Registration successful!');
           this.error = '';
           this.cdr.detectChanges();
         },
@@ -89,7 +89,7 @@ export class RegisterComponent {
             e?.error?.message ??
             (typeof e?.error === 'string' ? e.error : null) ??
             e?.message ??
-            'Registracija nije uspela.';
+            'Registration failed.';
 
           this.error = msg;
           this.message = '';

@@ -1,13 +1,13 @@
 <div class="activate-container">
     <div class="activate-card">
-        <h2>Aktivacija naloga</h2>
+        <h2>Account Activation</h2>
 
         <div class="status-message">
-            <p class="loading" *ngIf="loading">Aktiviram vaš nalog, molimo sačekajte...</p>
+            <p class="loading" *ngIf="loading">Activating your account, please wait...</p>
             <p class="success" *ngIf="message">{{ message }}</p>
             <p class="error" *ngIf="error">{{ error }}</p>
         </div>
 
-        <a routerLink="/user/login" class="action-link">Idi na login</a>
+        <a routerLink="/user/login" class="action-link">Go to login</a>
     </div>
 </div>

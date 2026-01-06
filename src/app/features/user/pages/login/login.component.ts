@@ -35,7 +35,7 @@ export class LoginComponent {
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.errorMsg = 'Unesi ispravan email i lozinku.';
+      this.errorMsg = 'Enter a valid email and password.';
       this.cdr.detectChanges();
       return;
     }
@@ -63,15 +63,15 @@ export class LoginComponent {
           const status = e?.status;
 
           if (status === 401) {
-            this.errorMsg = 'Pogrešan email ili lozinka.';
+            this.errorMsg = 'Incorrect email or password.';
           } else if (status === 403) {
-            this.errorMsg = 'Nalog nije aktiviran ili nemaš dozvolu.';
+            this.errorMsg = 'Account not activated or no permission.';
           } else {
             this.errorMsg =
               e?.error?.message ??
               (typeof e?.error === 'string' ? e.error : null) ??
               e?.message ??
-              'Greška pri login-u.';
+              'Login error.';
           }
 
           this.cdr.detectChanges();

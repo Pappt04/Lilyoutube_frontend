@@ -15,6 +15,7 @@ export class NavbarComponent {
   private auth = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
 
+  user = this.auth.currentUser;
   openProfile = output<void>();
 
   isBrowser = isPlatformBrowser(this.platformId);
