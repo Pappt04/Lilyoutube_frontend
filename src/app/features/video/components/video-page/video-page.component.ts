@@ -11,10 +11,12 @@ interface Comment {
     date: Date;
 }
 
+import { SecureMediaPipe } from '../../../../shared/pipes/secure-media.pipe';
+
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, SecureMediaPipe],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })

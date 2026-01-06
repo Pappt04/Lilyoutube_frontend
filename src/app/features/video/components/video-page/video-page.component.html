@@ -3,7 +3,7 @@
     <div class="main-content">
         <div class="video-section">
             <div class="player-wrapper">
-                <video controls [src]="getVideoUrl(video.videoPath)" class="video-player">
+                <video controls [src]="getVideoUrl(video.videoPath) | secureMedia | async" class="video-player">
                     Your browser does not support the video tag.
                 </video>
             </div>
