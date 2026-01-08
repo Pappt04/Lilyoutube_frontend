@@ -31,6 +31,14 @@ export class PostService {
     return this.http.post(`${this.baseUrl}/media/upload-picture`, formData, { responseType: 'text' });
   }
 
+  createPostWithFiles(videoData: VideoPost, videoFile: File, thumbnailFile: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('post', JSON.stringify(videoData));
+    formData.append('video', videoFile);
+    formData.append('thumbnail', thumbnailFile);
+    return this.http.post(`${this.baseUrl}/posts`, formData);
+  }
+
   createPost(videoData: VideoPost): Observable<any> {
     return this.http.post(`${this.baseUrl}/posts`, videoData);
   }
@@ -49,6 +57,10 @@ export class PostService {
 
   getThumbnailBlob(name: string): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/media/thumbnails/${name}`, { responseType: 'blob' });
+  }
+
+  incrementViewCount(postId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts/${postId}/view`, {});
   }
 
 }

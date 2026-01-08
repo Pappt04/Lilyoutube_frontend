@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-my-channel',
@@ -10,6 +11,9 @@ import { Router } from '@angular/router';
 })
 export class MyChannelComponent {
   private router = inject(Router);
+  private auth = inject(AuthService);
+
+  user = this.auth.currentUser;
 
   navigateToNewVideo() {
     this.router.navigate(['/my-channel/new-video']);

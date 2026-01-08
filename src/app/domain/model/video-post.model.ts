@@ -7,7 +7,8 @@ export interface VideoPost {
   location: string;
   videoPath: string;
   thumbnailPath: string;
-  likesCount: number;
-  commentsCount: number;
-  createdAt?: string;
+  likesCount?: number;
+  commentsCount?: number;
+  viewsCount?: number;
+  createdAt?: Date;
 }

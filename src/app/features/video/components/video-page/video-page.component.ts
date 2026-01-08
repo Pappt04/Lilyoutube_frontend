@@ -6,12 +6,21 @@ import { VideoPost } from '../../../../domain/model/video-post.model';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Comment, CommentPage } from '../../../../domain/model/comment.model';
-import { Observable, switchMap, tap, BehaviorSubject, catchError, of } from 'rxjs';
+import { User } from '../../../../domain/model/user.model';
+import { UserService } from '../../../user/services/user.service';
+import { Observable, switchMap, tap,BehaviorSubject, of, catchError } from 'rxjs';
+import { SecureMediaPipe } from '../../../../shared/pipes/secure-media.pipe';
+
+interface Comment {
+    user: string;
+    text: string;
+    date: Date;
+}
 
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule,RouterModule, SecureMediaPipe],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })
@@ -21,8 +30,10 @@ export class VideoPageComponent implements OnInit {
     private postService = inject(PostService);
     private commentService = inject(CommentService);
     private authService = inject(AuthService);
+    private userService = inject(UserService);
 
     video$!: Observable<VideoPost>;
+    author$!: Observable<User | null>;
     liked = false;
     currentLikes = 0;
     comments: Comment[] = [];
@@ -32,20 +43,23 @@ export class VideoPageComponent implements OnInit {
     errorMessage: string | null = null;
     isAuthenticated = false;
     currentPostId: number | null = null;
+    private viewTracked = false;
+    private videoName: string | null = null;
+    private videoId: number | null = null;
 
     ngOnInit() {
         this.isAuthenticated = this.authService.isAuthenticated();
         
         this.video$ = this.route.paramMap.pipe(
             switchMap(params => {
-                const id = params.get('id');
-                if (!id) {
+                this.videoName = params.get('id');
+                if (!this.videoName) {
                     this.router.navigate(['/home']);
                     throw new Error('No video ID provided');
                 }
-                return this.postService.getPostById(id);
+                return this.postService.getPostById(this.videoName);
             }),
-            tap(video => {
+            tap((video: VideoPost) => {
                 this.currentLikes = video.likesCount || 0;
                 if (video.id !== undefined && video.id !== null) {
                     this.currentPostId = video.id;
@@ -81,6 +95,22 @@ export class VideoPageComponent implements OnInit {
         const pageData = this.commentsPage$.value;
         if (pageData && !pageData.last) {
             this.loadComments(this.currentPage + 1);
+                this.author$ = this.userService.getUserById(video.user_id).pipe(
+                    catchError(() => of(null))
+                );
+            })
+        );
+    }
+
+    onVideoPlay() {
+        if (!this.viewTracked && this.videoName) {
+            this.postService.incrementViewCount(this.videoName).subscribe({
+                next: () => {
+                    this.viewTracked = true;
+                    console.log('View incremented');
+                },
+                error: (err: any) => console.error('Failed to increment view', err)
+            });
         }
     }
 

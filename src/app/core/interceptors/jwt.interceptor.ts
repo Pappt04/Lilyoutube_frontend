@@ -1,11 +1,21 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-    console.log('Intercepting request', req.url);
-    const authReq = req.clone({
-        setHeaders: {
-            Authorization: `Bearer my-token`
-        }
+  const platformId = inject(PLATFORM_ID);
+
+  if (!isPlatformBrowser(platformId)) {
+    return next(req);
+  }
+
+  const token = window.localStorage.getItem('auth_token');
+
+  if (token) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
     });
-    return next(authReq);
+  }
+
+  return next(req);
 };

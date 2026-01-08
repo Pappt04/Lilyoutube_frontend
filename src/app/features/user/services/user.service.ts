@@ -11,7 +11,7 @@ export class UserService {
     private http = inject(HttpClient);
     private baseUrl = environment.apiUrl;
 
-    getUserById(id: number): Observable<User> {
+    getUserById(id: number | string): Observable<User> {
         return this.http.get<User>(`${this.baseUrl}/users/${id}`);
     }
 }
