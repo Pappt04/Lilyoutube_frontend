@@ -3,6 +3,7 @@ import { HomeComponent } from './features/home/home.component';
 import { MyChannelComponent } from './features/user/my-channel/my-channel.component';
 import { NewVideoComponent } from './features/user/new-video/new-video.component';
 import { VideoPageComponent } from './features/video/components/video-page/video-page.component';
+import { ProfileComponent } from './features/user/components/profile/profile.component';
 import { LoginComponent } from './features/user/pages/login/login.component';
 
 export const routes: Routes = [
@@ -10,6 +11,7 @@ export const routes: Routes = [
     { path: 'my-channel', component: MyChannelComponent },
     { path: 'my-channel/new-video', component: NewVideoComponent },
     { path: 'videos/:id', component: VideoPageComponent },
+    { path: 'users/:id', component: ProfileComponent },
     { path: 'user/login', component: LoginComponent },
 
     {
