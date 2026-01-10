@@ -63,4 +63,11 @@ export class PostService {
     return this.http.post(`${this.baseUrl}/posts/${postId}/view`, {});
   }
 
+  likePost(postId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts/${postId}/like`, {});
+  }
+
+  unlikePost(postId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts/${postId}/unlike`, {});
+  }
 }
