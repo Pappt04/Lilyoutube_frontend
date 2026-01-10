@@ -3,7 +3,7 @@
     <div class="main-content">
         <div class="video-section">
             <div class="player-wrapper">
-                <video controls [src]="getVideoUrl(video.videoPath) | secureMedia | async" class="video-player"
+                <video controls [src]="getVideoUrl(video.videoPath)" class="video-player"
                     (play)="onVideoPlay()">
                     Your browser does not support the video tag.
                 </video>
@@ -15,11 +15,9 @@
                     <div class="video-meta-detail">
                         <div class="user-avatar"></div>
                         <div class="user-info">
-                            @if (author$ | async; as author) {
-                            <span class="username">{{ author.firstName }} {{ author.lastName }}</span>
-                            } @else {
-                            <span class="username">Loading user...</span>
-                            }
+                            <span class="username">
+                                <a [routerLink]="['/users', video.user_id]" class="user-link">User #{{ video.user_id }}</a>
+                            </span>
                             <span class="subscribers">Unknown subscribers</span>
                         </div>
                         <button class="subscribe-btn">Subscribe</button>

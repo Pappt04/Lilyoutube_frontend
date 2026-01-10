@@ -6,21 +6,12 @@ import { VideoPost } from '../../../../domain/model/video-post.model';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Comment, CommentPage } from '../../../../domain/model/comment.model';
-import { User } from '../../../../domain/model/user.model';
-import { UserService } from '../../../user/services/user.service';
-import { Observable, switchMap, tap,BehaviorSubject, of, catchError } from 'rxjs';
-import { SecureMediaPipe } from '../../../../shared/pipes/secure-media.pipe';
-
-interface Comment {
-    user: string;
-    text: string;
-    date: Date;
-}
+import { Observable, switchMap, tap, BehaviorSubject, of, catchError } from 'rxjs';
 
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule,RouterModule, SecureMediaPipe],
+    imports: [CommonModule, RouterModule],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })
@@ -30,10 +21,8 @@ export class VideoPageComponent implements OnInit {
     private postService = inject(PostService);
     private commentService = inject(CommentService);
     private authService = inject(AuthService);
-    private userService = inject(UserService);
 
     video$!: Observable<VideoPost>;
-    author$!: Observable<User | null>;
     liked = false;
     currentLikes = 0;
     comments: Comment[] = [];
@@ -45,11 +34,10 @@ export class VideoPageComponent implements OnInit {
     currentPostId: number | null = null;
     private viewTracked = false;
     private videoName: string | null = null;
-    private videoId: number | null = null;
 
     ngOnInit() {
-        this.isAuthenticated = this.authService.isAuthenticated();
-        
+        this.isAuthenticated = this.authService.isLoggedIn();
+
         this.video$ = this.route.paramMap.pipe(
             switchMap(params => {
                 this.videoName = params.get('id');
@@ -71,10 +59,10 @@ export class VideoPageComponent implements OnInit {
 
     loadComments(page: number) {
         if (!this.currentPostId) return;
-        
+
         this.loadingComments = true;
         this.errorMessage = null;
-        
+
         this.commentService.getCommentsByPost(this.currentPostId, page).pipe(
             catchError(error => {
                 this.errorMessage = 'Failed to load comments';
@@ -95,11 +83,7 @@ export class VideoPageComponent implements OnInit {
         const pageData = this.commentsPage$.value;
         if (pageData && !pageData.last) {
             this.loadComments(this.currentPage + 1);
-                this.author$ = this.userService.getUserById(video.user_id).pipe(
-                    catchError(() => of(null))
-                );
-            })
-        );
+        }
     }
 
     onVideoPlay() {
@@ -138,11 +122,12 @@ export class VideoPageComponent implements OnInit {
             return;
         }
 
-        const userId = this.authService.getCurrentUserId();
-        if (!userId) {
+        const currentUser = this.authService.currentUser();
+        if (!currentUser || !currentUser.id) {
             this.errorMessage = 'You must be logged in to comment';
             return;
         }
+        const userId = typeof currentUser.id === 'string' ? parseInt(currentUser.id, 10) : Number(currentUser.id);
 
         this.loadingComments = true;
         this.errorMessage = null;
