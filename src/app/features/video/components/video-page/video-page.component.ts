@@ -52,6 +52,13 @@ export class VideoPageComponent implements OnInit {
                 if (video.id !== undefined && video.id !== null) {
                     this.currentPostId = video.id;
                     this.loadComments(0);
+
+                    if (this.isAuthenticated) {
+                        this.postService.isLiked(video.id).subscribe({
+                            next: (isLiked) => this.liked = isLiked,
+                            error: (err) => console.error('Failed to check if liked', err)
+                        });
+                    }
                 }
             })
         );
@@ -72,7 +79,11 @@ export class VideoPageComponent implements OnInit {
         ).subscribe(pageData => {
             if (pageData) {
                 this.commentsPage$.next(pageData);
-                this.comments = pageData.content;
+                if (page === 0) {
+                    this.comments = pageData.content;
+                } else {
+                    this.comments = [...this.comments, ...pageData.content];
+                }
                 this.currentPage = page;
             }
             this.loadingComments = false;
@@ -107,8 +118,32 @@ export class VideoPageComponent implements OnInit {
             this.errorMessage = 'You must be logged in to like posts';
             return;
         }
+
+        if (!this.currentPostId) return;
+
+        const originalLiked = this.liked;
+        const originalLikes = this.currentLikes;
+
         this.liked = !this.liked;
         this.currentLikes += this.liked ? 1 : -1;
+
+        if (this.liked) {
+            this.postService.likePost(this.currentPostId).subscribe({
+                error: (err) => {
+                    this.liked = originalLiked;
+                    this.currentLikes = originalLikes;
+                    this.errorMessage = err.status === 409 ? 'Already liked' : 'Failed to like post';
+                }
+            });
+        } else {
+            this.postService.unlikePost(this.currentPostId).subscribe({
+                error: () => {
+                    this.liked = originalLiked;
+                    this.currentLikes = originalLikes;
+                    this.errorMessage = 'Failed to unlike post';
+                }
+            });
+        }
     }
 
     addComment(commentInput: HTMLTextAreaElement) {
