@@ -70,4 +70,12 @@ export class PostService {
   unlikePost(postId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/posts/${postId}/unlike`, {});
   }
+
+  isLiked(postId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/posts/${postId}/liked`);
+  }
+
+  getLikedVideos(): Observable<VideoPost[]> {
+    return this.http.get<VideoPost[]>(`${this.baseUrl}/posts/liked`);
+  }
 }

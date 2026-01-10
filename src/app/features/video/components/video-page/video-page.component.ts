@@ -52,6 +52,13 @@ export class VideoPageComponent implements OnInit {
                 if (video.id !== undefined && video.id !== null) {
                     this.currentPostId = video.id;
                     this.loadComments(0);
+
+                    if (this.isAuthenticated) {
+                        this.postService.isLiked(video.id).subscribe({
+                            next: (isLiked) => this.liked = isLiked,
+                            error: (err) => console.error('Failed to check if liked', err)
+                        });
+                    }
                 }
             })
         );
