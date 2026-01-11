@@ -29,7 +29,8 @@ export class VideoPageComponent implements OnInit {
     commentsPage$ = new BehaviorSubject<CommentPage | null>(null);
     currentPage = 0;
     loadingComments = false;
-    errorMessage: string | null = null;
+    likeErrorMessage: string | null = null;
+    commentErrorMessage: string | null = null;
     isAuthenticated = false;
     currentPostId: number | null = null;
     private viewTracked = false;
@@ -52,6 +53,13 @@ export class VideoPageComponent implements OnInit {
                 if (video.id !== undefined && video.id !== null) {
                     this.currentPostId = video.id;
                     this.loadComments(0);
+
+                    if (this.isAuthenticated) {
+                        this.postService.isLiked(video.id).subscribe({
+                            next: (isLiked) => this.liked = isLiked,
+                            error: (err) => console.error('Failed to check if liked', err)
+                        });
+                    }
                 }
             })
         );
@@ -61,18 +69,22 @@ export class VideoPageComponent implements OnInit {
         if (!this.currentPostId) return;
 
         this.loadingComments = true;
-        this.errorMessage = null;
+        this.commentErrorMessage = null;
 
         this.commentService.getCommentsByPost(this.currentPostId, page).pipe(
             catchError(error => {
-                this.errorMessage = 'Failed to load comments';
+                this.commentErrorMessage = 'Failed to load comments';
                 this.loadingComments = false;
                 return of(null);
             })
         ).subscribe(pageData => {
             if (pageData) {
                 this.commentsPage$.next(pageData);
-                this.comments = pageData.content;
+                if (page === 0) {
+                    this.comments = pageData.content;
+                } else {
+                    this.comments = [...this.comments, ...pageData.content];
+                }
                 this.currentPage = page;
             }
             this.loadingComments = false;
@@ -104,16 +116,41 @@ export class VideoPageComponent implements OnInit {
 
     toggleLike() {
         if (!this.isAuthenticated) {
-            this.errorMessage = 'You must be logged in to like posts';
+            this.likeErrorMessage = 'You must be logged in to like posts';
             return;
         }
+
+        if (!this.currentPostId) return;
+
+        const originalLiked = this.liked;
+        const originalLikes = this.currentLikes;
+
         this.liked = !this.liked;
         this.currentLikes += this.liked ? 1 : -1;
+        this.likeErrorMessage = null;
+
+        if (this.liked) {
+            this.postService.likePost(this.currentPostId).subscribe({
+                error: (err) => {
+                    this.liked = originalLiked;
+                    this.currentLikes = originalLikes;
+                    this.likeErrorMessage = err.status === 409 ? 'Already liked' : 'Failed to like post';
+                }
+            });
+        } else {
+            this.postService.unlikePost(this.currentPostId).subscribe({
+                error: () => {
+                    this.liked = originalLiked;
+                    this.currentLikes = originalLikes;
+                    this.likeErrorMessage = 'Failed to unlike post';
+                }
+            });
+        }
     }
 
     addComment(commentInput: HTMLTextAreaElement) {
         if (!this.isAuthenticated) {
-            this.errorMessage = 'You must be logged in to comment';
+            this.commentErrorMessage = 'You must be logged in to comment';
             return;
         }
 
@@ -124,22 +161,22 @@ export class VideoPageComponent implements OnInit {
 
         const currentUser = this.authService.currentUser();
         if (!currentUser || !currentUser.id) {
-            this.errorMessage = 'You must be logged in to comment';
+            this.commentErrorMessage = 'You must be logged in to comment';
             return;
         }
         const userId = typeof currentUser.id === 'string' ? parseInt(currentUser.id, 10) : Number(currentUser.id);
 
         this.loadingComments = true;
-        this.errorMessage = null;
+        this.commentErrorMessage = null;
 
         this.commentService.createComment(this.currentPostId, text, userId).pipe(
             catchError(error => {
                 if (error.status === 429) {
-                    this.errorMessage = 'Maximum 60 comments per hour. Please try again later.';
+                    this.commentErrorMessage = 'Maximum 60 comments per hour. Please try again later.';
                 } else if (error.status === 401) {
-                    this.errorMessage = 'You must be logged in to comment';
+                    this.commentErrorMessage = 'You must be logged in to comment';
                 } else {
-                    this.errorMessage = 'Failed to post comment';
+                    this.commentErrorMessage = 'Failed to post comment';
                 }
                 this.loadingComments = false;
                 return of(null);
