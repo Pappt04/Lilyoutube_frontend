@@ -29,7 +29,8 @@ export class VideoPageComponent implements OnInit {
     commentsPage$ = new BehaviorSubject<CommentPage | null>(null);
     currentPage = 0;
     loadingComments = false;
-    errorMessage: string | null = null;
+    likeErrorMessage: string | null = null;
+    commentErrorMessage: string | null = null;
     isAuthenticated = false;
     currentPostId: number | null = null;
     private viewTracked = false;
@@ -68,11 +69,11 @@ export class VideoPageComponent implements OnInit {
         if (!this.currentPostId) return;
 
         this.loadingComments = true;
-        this.errorMessage = null;
+        this.commentErrorMessage = null;
 
         this.commentService.getCommentsByPost(this.currentPostId, page).pipe(
             catchError(error => {
-                this.errorMessage = 'Failed to load comments';
+                this.commentErrorMessage = 'Failed to load comments';
                 this.loadingComments = false;
                 return of(null);
             })
@@ -115,7 +116,7 @@ export class VideoPageComponent implements OnInit {
 
     toggleLike() {
         if (!this.isAuthenticated) {
-            this.errorMessage = 'You must be logged in to like posts';
+            this.likeErrorMessage = 'You must be logged in to like posts';
             return;
         }
 
@@ -126,13 +127,14 @@ export class VideoPageComponent implements OnInit {
 
         this.liked = !this.liked;
         this.currentLikes += this.liked ? 1 : -1;
+        this.likeErrorMessage = null;
 
         if (this.liked) {
             this.postService.likePost(this.currentPostId).subscribe({
                 error: (err) => {
                     this.liked = originalLiked;
                     this.currentLikes = originalLikes;
-                    this.errorMessage = err.status === 409 ? 'Already liked' : 'Failed to like post';
+                    this.likeErrorMessage = err.status === 409 ? 'Already liked' : 'Failed to like post';
                 }
             });
         } else {
@@ -140,7 +142,7 @@ export class VideoPageComponent implements OnInit {
                 error: () => {
                     this.liked = originalLiked;
                     this.currentLikes = originalLikes;
-                    this.errorMessage = 'Failed to unlike post';
+                    this.likeErrorMessage = 'Failed to unlike post';
                 }
             });
         }
@@ -148,7 +150,7 @@ export class VideoPageComponent implements OnInit {
 
     addComment(commentInput: HTMLTextAreaElement) {
         if (!this.isAuthenticated) {
-            this.errorMessage = 'You must be logged in to comment';
+            this.commentErrorMessage = 'You must be logged in to comment';
             return;
         }
 
@@ -159,22 +161,22 @@ export class VideoPageComponent implements OnInit {
 
         const currentUser = this.authService.currentUser();
         if (!currentUser || !currentUser.id) {
-            this.errorMessage = 'You must be logged in to comment';
+            this.commentErrorMessage = 'You must be logged in to comment';
             return;
         }
         const userId = typeof currentUser.id === 'string' ? parseInt(currentUser.id, 10) : Number(currentUser.id);
 
         this.loadingComments = true;
-        this.errorMessage = null;
+        this.commentErrorMessage = null;
 
         this.commentService.createComment(this.currentPostId, text, userId).pipe(
             catchError(error => {
                 if (error.status === 429) {
-                    this.errorMessage = 'Maximum 60 comments per hour. Please try again later.';
+                    this.commentErrorMessage = 'Maximum 60 comments per hour. Please try again later.';
                 } else if (error.status === 401) {
-                    this.errorMessage = 'You must be logged in to comment';
+                    this.commentErrorMessage = 'You must be logged in to comment';
                 } else {
-                    this.errorMessage = 'Failed to post comment';
+                    this.commentErrorMessage = 'Failed to post comment';
                 }
                 this.loadingComments = false;
                 return of(null);

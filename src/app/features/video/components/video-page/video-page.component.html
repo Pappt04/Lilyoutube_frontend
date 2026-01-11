@@ -45,6 +45,10 @@
                 }
             </div>
 
+            @if (likeErrorMessage) {
+                <div class="error-message">{{ likeErrorMessage }}</div>
+            }
+            
             <div class="comments-section">
                 @if (commentsPage$ | async; as pageData) {
                     <h3>{{ pageData.totalElements }} Comments</h3>
@@ -52,32 +56,26 @@
                     <h3>Comments</h3>
                 }
                 
-                @if (errorMessage) {
-                    <div class="error-message">{{ errorMessage }}</div>
+                @if (commentErrorMessage) {
+                    <div class="error-message">{{ commentErrorMessage }}</div>
                 }
 
-                @if (isAuthenticated) {
-                    <div class="add-comment">
-                        <div class="user-avatar small"></div>
-                        <div class="comment-input-wrapper">
-                            <textarea #commentInput placeholder="Add a comment..." rows="1" [disabled]="loadingComments"></textarea>
-                            <div class="comment-btns">
-                                <button class="cancel-btn" (click)="commentInput.value = ''" [disabled]="loadingComments">Cancel</button>
-                                <button class="comment-btn" (click)="addComment(commentInput)" [disabled]="loadingComments">
-                                    @if (loadingComments) {
-                                        Posting...
-                                    } @else {
-                                        Comment
-                                    }
-                                </button>
-                            </div>
+                <div class="add-comment">
+                    <div class="user-avatar small"></div>
+                    <div class="comment-input-wrapper">
+                        <textarea #commentInput placeholder="Add a comment..." rows="1" [disabled]="loadingComments"></textarea>
+                        <div class="comment-btns">
+                            <button class="cancel-btn" (click)="commentInput.value = ''" [disabled]="loadingComments">Cancel</button>
+                            <button class="comment-btn" (click)="addComment(commentInput)" [disabled]="loadingComments">
+                                @if (loadingComments) {
+                                    Posting...
+                                } @else {
+                                    Comment
+                                }
+                            </button>
                         </div>
                     </div>
-                } @else {
-                    <div class="auth-prompt">
-                        <p>You must be <a routerLink="/login">logged in</a> to leave a comment.</p>
-                    </div>
-                }
+                </div>
 
                 @if (loadingComments && comments.length === 0) {
                     <div class="loading-comments">Loading comments...</div>
