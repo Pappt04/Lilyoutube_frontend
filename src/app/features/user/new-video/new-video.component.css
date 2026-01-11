@@ -1,0 +1,150 @@
+.upload-container {
+  padding: 0;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  background-color: #ffffff;
+  /* Use white background for the whole page */
+}
+
+.upload-card {
+  background-color: #ffffff;
+  /* White card */
+  padding: 3rem;
+  width: 100%;
+  min-height: 100%;
+  color: #333333;
+  /* Dark text */
+}
+
+h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #9D3215;
+}
+
+.subtitle {
+  color: #666666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444444;
+}
+
+input[type="text"],
+textarea {
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #333333;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #9D3215;
+  box-shadow: 0 0 0 2px rgba(157, 50, 21, 0.1);
+}
+
+.file-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .file-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background-color: #9D3215;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #bf3d1a;
+}
+
+.btn-primary:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #cccccc;
+  color: #444444;
+}
+
+.btn-outline:hover {
+  background-color: #f9f9f9;
+  border-color: #999999;
+}
+
+.btn-text {
+  background: transparent;
+  color: #666666;
+}
+
+.btn-text:hover {
+  background-color: #f0f0f0;
+}
+
+.file-name {
+  font-size: 0.85rem;
+  color: #9D3215;
+  word-break: break-all;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}

@@ -1,0 +1,13 @@
+<div class="activate-container">
+    <div class="activate-card">
+        <h2>Account Activation</h2>
+
+        <div class="status-message">
+            <p class="loading" *ngIf="loading">Activating your account, please wait...</p>
+            <p class="success" *ngIf="message">{{ message }}</p>
+            <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <a routerLink="/user/login" class="action-link">Go to login</a>
+    </div>
+</div>

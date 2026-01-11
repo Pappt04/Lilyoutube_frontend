@@ -1,0 +1,77 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Registration</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input formControlName="firstName" placeholder="John" />
+          <small class="error-text" *ngIf="form.get('firstName')?.touched && form.get('firstName')?.invalid">
+            First name is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Last Name</label>
+          <input formControlName="lastName" placeholder="Doe" />
+          <small class="error-text" *ngIf="form.get('lastName')?.touched && form.get('lastName')?.invalid">
+            Last name is required.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="example@email.com" />
+          <small class="error-text" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+            Enter a valid email.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Username</label>
+          <input formControlName="username" placeholder="user123" />
+          <small class="error-text" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+            Username is required.
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Address</label>
+          <input formControlName="address" placeholder="Street and number" />
+          <small class="error-text" *ngIf="form.get('address')?.touched && form.get('address')?.invalid">
+            Address is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+          <small class="error-text" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+            Minimum 8 characters.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" formControlName="confirmPassword" />
+          <small class="error-text"
+            *ngIf="form.get('confirmPassword')?.touched && (form.get('confirmPassword')?.invalid || form.getRawValue().password !== form.getRawValue().confirmPassword)">
+            Passwords must match.
+          </small>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Sending...' : 'Register' }}
+      </button>
+
+      <div class="success-message" *ngIf="message">{{ message }}</div>
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+
+      <p class="footer-text">
+        Already have an account? <a routerLink="/user/login">Log in</a>
+      </p>
+    </form>
+  </div>
+</div>
