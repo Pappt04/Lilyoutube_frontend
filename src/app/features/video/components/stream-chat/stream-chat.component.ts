@@ -67,6 +67,11 @@ export class StreamChatComponent implements OnInit, OnDestroy, AfterViewChecked 
             this.socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
+
+                    if (data && data.type === 'heartbeat') {
+                        return;
+                    }
+
                     const messageObj = typeof data === 'string'
                         ? { sender: 'System', content: data }
                         : { sender: data.sender || 'User', content: data.content || JSON.stringify(data) };
