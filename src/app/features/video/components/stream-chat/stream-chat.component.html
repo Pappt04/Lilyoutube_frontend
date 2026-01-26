@@ -1,0 +1,23 @@
+<div class="chat-container">
+    <div class="chat-header">
+        <h3>Live Chat</h3>
+        <span class="status-indicator" [class.connected]="isConnected()"></span>
+    </div>
+
+    <div class="messages-list" #scrollContainer>
+        <div *ngFor="let msg of messages()" class="message-item">
+            {{ msg }}
+        </div>
+        <div *ngIf="error()" class="error-message">
+            {{ error() }}
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Say something..."
+            [disabled]="!isConnected()">
+        <button (click)="sendMessage()" [disabled]="!isConnected() || !newMessage.trim()">
+            Send
+        </button>
+    </div>
+</div>

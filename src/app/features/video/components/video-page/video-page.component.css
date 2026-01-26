@@ -16,6 +16,11 @@
     min-width: 0;
 }
 
+.side-content {
+    width: 350px;
+    flex-shrink: 0;
+}
+
 .player-wrapper {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -335,7 +340,8 @@ textarea:focus {
         flex-direction: column;
     }
 
-    .recommendations-section {
+    .recommendations-section,
+    .side-content {
         width: 100%;
     }
 }
