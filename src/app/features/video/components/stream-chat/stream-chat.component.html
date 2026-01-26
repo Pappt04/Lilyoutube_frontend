@@ -6,7 +6,7 @@
 
     <div class="messages-list" #scrollContainer>
         <div *ngFor="let msg of messages()" class="message-item">
-            {{ msg }}
+            <strong>{{ msg.sender }}:</strong> {{ msg.content }}
         </div>
         <div *ngIf="error()" class="error-message">
             {{ error() }}

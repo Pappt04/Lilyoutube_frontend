@@ -18,7 +18,7 @@ export class StreamChatComponent implements OnInit, OnDestroy, AfterViewChecked 
     private authService = inject(AuthService);
     private socket: WebSocket | null = null;
 
-    messages = signal<string[]>([]);
+    messages = signal<{ sender: string, content: string }[]>([]);
     newMessage = '';
     isConnected = signal(false);
     error = signal<string | null>(null);
@@ -30,53 +30,79 @@ export class StreamChatComponent implements OnInit, OnDestroy, AfterViewChecked 
     connect() {
         if (!this.videoName) return;
 
-        const token = this.authService.getToken();
-        if (!token) {
+        const rawToken = this.authService.getToken();
+        if (!rawToken) {
             this.error.set('You must be logged in to chat.');
             this.isConnected.set(false);
             return;
         }
 
-        // e.g., 'http://localhost:8888/api' -> 'ws://localhost:8888/stream/video/chat'
-        const apiBase = environment.apiUrl//.replace('/api', '');
+        let token = rawToken;
+        if (token.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(token);
+                token = parsed.token || token;
+            } catch (e) {
+                // ignore
+            }
+        }
+        const cleanToken = token.trim();
+
+        const apiBase = environment.apiUrl;
         const wsProtocol = apiBase.startsWith('https') ? 'wss:' : 'ws:';
-        const wsHost = apiBase.replace(/^https?:\/\//, '');
-        const wsUrl = `${wsProtocol}//${wsHost}/stream/${this.videoName}/chat`;
+        const wsHost = apiBase.replace(/^https?:\/\//, '').split('/api')[0];
+        const wsUrl = `${wsProtocol}//${wsHost}/api/stream/${encodeURIComponent(this.videoName)}/chat?token=${encodeURIComponent(cleanToken)}`;
 
         console.log('Connecting to WebSocket:', wsUrl);
-        this.socket = new WebSocket(wsUrl, [token]);
 
-        this.socket.onopen = () => {
-            this.isConnected.set(true);
-            this.error.set(null);
-            console.log('Connected to chat');
-        };
+        try {
+            this.socket = new WebSocket(wsUrl);
 
-        this.socket.onmessage = (event) => {
-            const message = event.data;
-            this.messages.update(msgs => [...msgs, message]);
-        };
+            this.socket.onopen = () => {
+                this.isConnected.set(true);
+                this.error.set(null);
+                console.log('Connected to chat');
+            };
 
-        this.socket.onclose = (event) => {
-            this.isConnected.set(false);
-            console.log('Chat disconnected', event);
-            if (!event.wasClean) {
-                this.error.set(`Connection lost (${event.code}). Retrying...`);
-                // Optional: Add simple retry logic
-                setTimeout(() => this.connect(), 5000);
-            }
-        };
+            this.socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    const messageObj = typeof data === 'string'
+                        ? { sender: 'System', content: data }
+                        : { sender: data.sender || 'User', content: data.content || JSON.stringify(data) };
 
-        this.socket.onerror = (error) => {
-            console.error('WebSocket error', error);
-            this.error.set('Connection error.');
-        };
+                    this.messages.update(msgs => [...msgs, messageObj]);
+                } catch (e) {
+                    this.messages.update(msgs => [...msgs, { sender: 'Unknown', content: event.data }]);
+                }
+            };
+
+            this.socket.onclose = (event) => {
+                this.isConnected.set(false);
+                console.log('Chat disconnected', event);
+                if (!event.wasClean) {
+                    this.error.set(`Connection lost.`);
+                }
+            };
+
+            this.socket.onerror = (error) => {
+                console.error('WebSocket error', error);
+                this.error.set('WebSocket connection error.');
+            };
+        } catch (e: any) {
+            console.error('Failed to create WebSocket', e);
+            this.error.set(`Init error: ${e.message}`);
+        }
     }
 
     sendMessage() {
         if (!this.newMessage.trim() || !this.socket || this.socket.readyState !== WebSocket.OPEN) return;
 
-        this.socket.send(this.newMessage);
+        const payload = {
+            content: this.newMessage
+        };
+
+        this.socket.send(JSON.stringify(payload));
         this.newMessage = '';
     }
 
