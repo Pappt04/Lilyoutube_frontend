@@ -8,10 +8,12 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { Comment, CommentPage } from '../../../../domain/model/comment.model';
 import { Observable, switchMap, tap, BehaviorSubject, of, catchError } from 'rxjs';
 
+import { StreamChatComponent } from '../stream-chat/stream-chat.component';
+
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, StreamChatComponent],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })
@@ -33,8 +35,8 @@ export class VideoPageComponent implements OnInit {
     commentErrorMessage: string | null = null;
     isAuthenticated = false;
     currentPostId: number | null = null;
-    private viewTracked = false;
-    private videoName: string | null = null;
+    viewTracked = false;
+    videoName: string | null = null;
 
     ngOnInit() {
         this.isAuthenticated = this.authService.isLoggedIn();
