@@ -27,7 +27,8 @@ export class NewVideoComponent {
     tags: ['', [Validators.required]],
     location: [''],
     thumbnail: [null, [Validators.required]],
-    videoFile: [null, [Validators.required]]
+    videoFile: [null, [Validators.required]],
+    scheduledStartTime: ['']
   });
 
   videoError: string | null = null;
@@ -82,6 +83,7 @@ export class NewVideoComponent {
         description: this.videoForm.value.description,
         tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
         location: this.videoForm.value.location,
+        scheduledStartTime: this.videoForm.value.scheduledStartTime ? new Date(this.videoForm.value.scheduledStartTime) : undefined,
         videoPath: '', // Will be set by server or handled in transactional flow
         thumbnailPath: '', // Will be set by server or handled in transactional flow
         commentsCount: 0,

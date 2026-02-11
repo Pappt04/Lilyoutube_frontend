@@ -43,6 +43,13 @@
                 <input type="text" id="location" formControlName="location" placeholder="Where was this video filmed?">
             </div>
 
+            <!-- Scheduled Start Time -->
+            <div class="form-group">
+                <label for="scheduledStartTime">Schedule Release (Optional)</label>
+                <input type="datetime-local" id="scheduledStartTime" formControlName="scheduledStartTime">
+                <small class="hint">Leave empty to publish immediately.</small>
+            </div>
+
             <div class="file-sections">
                 <!-- Thumbnail -->
                 <div class="form-group file-group">

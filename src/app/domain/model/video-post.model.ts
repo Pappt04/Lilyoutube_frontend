@@ -11,4 +11,5 @@ export interface VideoPost {
   commentsCount?: number;
   viewsCount?: number;
   createdAt?: Date;
+  scheduledStartTime?: Date;
 }

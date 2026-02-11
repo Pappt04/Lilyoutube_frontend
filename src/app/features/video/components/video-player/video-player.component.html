@@ -1,0 +1,13 @@
+<div class="video-container">
+    <div *ngIf="isScheduled" class="scheduled-overlay">
+        <div class="scheduled-content">
+            <h2>Upcoming Live Stream</h2>
+            <div class="countdown">{{ timeRemaining }}</div>
+            <p>Scheduled for {{ scheduledStartTime | date:'medium' }}</p>
+        </div>
+    </div>
+
+    <video #videoPlayer controls class="video-player" [class.hidden]="isScheduled" crossorigin="anonymous">
+        Your browser does not support the video tag.
+    </video>
+</div>
