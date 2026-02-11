@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import Hls from 'hls.js';
 
 @Component({
@@ -12,12 +12,16 @@ import Hls from 'hls.js';
 export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input() videoUrl: string = '';
     @Input() scheduledStartTime?: Date;
+    @Output() play = new EventEmitter<void>();
     @ViewChild('videoPlayer') videoElementRef!: ElementRef<HTMLVideoElement>;
 
     hls: Hls | null = null;
     isScheduled = false;
     timeRemaining = '';
     private timerInterval: any;
+    private playEventEmitted = false;
+
+    constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
     ngOnInit() {
         this.checkScheduledStatus();
@@ -27,7 +31,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        if (!this.isScheduled && this.videoUrl) {
+        if (isPlatformBrowser(this.platformId) && !this.isScheduled && this.videoUrl) {
             this.initPlayer();
         }
     }
@@ -83,6 +87,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private initPlayer() {
+        if (!isPlatformBrowser(this.platformId)) {
+            return;
+        }
+
         if (!this.videoElementRef || !this.videoElementRef.nativeElement) {
             console.warn('Video element not available yet, retrying...');
             setTimeout(() => this.initPlayer(), 100);
@@ -90,6 +98,15 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         const video = this.videoElementRef.nativeElement;
+
+        // Add play event listener to emit play event
+        video.addEventListener('play', () => {
+            if (!this.playEventEmitted) {
+                this.playEventEmitted = true;
+                this.play.emit();
+                console.log('Video play event emitted');
+            }
+        });
 
         if (Hls.isSupported()) {
             this.hls = new Hls();

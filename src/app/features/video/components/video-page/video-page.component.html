@@ -4,7 +4,8 @@
         <div class="video-section">
             <div class="player-wrapper">
                 <app-video-player [videoUrl]="getVideoUrl(video.videoPath)"
-                    [scheduledStartTime]="video.scheduledStartTime">
+                    [scheduledStartTime]="video.scheduledStartTime"
+                    (play)="onVideoPlay()">
                 </app-video-player>
             </div>
 
