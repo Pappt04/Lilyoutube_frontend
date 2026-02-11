@@ -47,7 +47,8 @@ label {
 }
 
 input[type="text"],
-textarea {
+textarea,
+input[type="datetime-local"] {
   background-color: #ffffff;
   border: 1px solid #dddddd;
   border-radius: 8px;
@@ -58,10 +59,21 @@ textarea {
 }
 
 input[type="text"]:focus,
-textarea:focus {
+textarea:focus,
+input[type="datetime-local"]:focus {
   outline: none;
   border-color: #9D3215;
   box-shadow: 0 0 0 2px rgba(157, 50, 21, 0.1);
+}
+
+.datetime-input {
+  max-width: 400px;
+}
+
+.hint {
+  color: #888888;
+  font-size: 0.85rem;
+  font-style: italic;
 }
 
 .file-sections {
@@ -147,4 +159,73 @@ textarea:focus {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+}
+
+/* Release Type Toggle Styles */
+.release-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .release-toggle {
+    grid-template-columns: 1fr;
+  }
+}
+
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #dddddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.toggle-option:hover {
+  border-color: #9D3215;
+  background-color: #fef9f8;
+}
+
+.toggle-option.active {
+  border-color: #9D3215;
+  background-color: #fef5f3;
+  box-shadow: 0 0 0 3px rgba(157, 50, 21, 0.1);
+}
+
+.toggle-option svg {
+  flex-shrink: 0;
+  color: #666666;
+  transition: color 0.2s;
+}
+
+.toggle-option.active svg {
+  color: #9D3215;
+}
+
+.toggle-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toggle-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333333;
+}
+
+.toggle-description {
+  font-size: 0.85rem;
+  color: #888888;
+}
+
+.toggle-option.active .toggle-title {
+  color: #9D3215;
 }

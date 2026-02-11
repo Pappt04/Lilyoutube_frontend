@@ -45,11 +45,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.scheduledStartTime) {
             const start = new Date(this.scheduledStartTime);
             const now = new Date();
-            if (start > now) {
-                this.isScheduled = true;
-            } else {
-                this.isScheduled = false;
-            }
+            this.isScheduled = start > now;
         } else {
             this.isScheduled = false;
         }
@@ -62,8 +58,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
             this.checkScheduledStatus();
             if (!this.isScheduled) {
                 clearInterval(this.timerInterval);
-                // Build the player when schedule ends
-                setTimeout(() => this.initPlayer(), 0);
+                setTimeout(() => this.initPlayer(), 300);
             }
         }, 1000);
     }
@@ -88,6 +83,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private initPlayer() {
+        if (!this.videoElementRef || !this.videoElementRef.nativeElement) {
+            console.warn('Video element not available yet, retrying...');
+            setTimeout(() => this.initPlayer(), 100);
+            return;
+        }
+
         const video = this.videoElementRef.nativeElement;
 
         if (Hls.isSupported()) {

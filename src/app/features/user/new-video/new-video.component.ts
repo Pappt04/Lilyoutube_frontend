@@ -5,8 +5,6 @@ import { Router } from '@angular/router';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { VideoPost } from '../../../domain/model/video-post.model';
-import { EMPTY } from 'rxjs';
-import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-new-video',
@@ -21,6 +19,8 @@ export class NewVideoComponent {
   private postService = inject(PostService);
   private authService = inject(AuthService);
 
+  releaseType: 'instant' | 'scheduled' = 'instant';
+
   videoForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required]],
@@ -34,6 +34,17 @@ export class NewVideoComponent {
   videoError: string | null = null;
   thumbnailError: string | null = null;
   maxVideoSize = 200 * 1024 * 1024; // 200MB
+
+  setReleaseType(type: 'instant' | 'scheduled') {
+    this.releaseType = type;
+    if (type === 'instant') {
+      this.videoForm.patchValue({ scheduledStartTime: '' });
+      this.videoForm.get('scheduledStartTime')?.clearValidators();
+    } else {
+      this.videoForm.get('scheduledStartTime')?.setValidators([Validators.required]);
+    }
+    this.videoForm.get('scheduledStartTime')?.updateValueAndValidity();
+  }
 
   onVideoFileChange(event: any) {
     const file = event.target.files[0];
