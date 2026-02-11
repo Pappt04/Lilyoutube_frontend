@@ -10,7 +10,8 @@ const routes: Routes = [
     { path: 'profile', component: ProfileComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'activate', component: ActivateComponent }
+    { path: 'activate', component: ActivateComponent },
+    { path: 'new-video', loadComponent: () => import('./new-video/new-video.component').then(m => m.NewVideoComponent) }
 ];
 
 @NgModule({

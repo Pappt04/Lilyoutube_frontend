@@ -5,8 +5,6 @@ import { Router } from '@angular/router';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { VideoPost } from '../../../domain/model/video-post.model';
-import { EMPTY } from 'rxjs';
-import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-new-video',
@@ -21,18 +19,32 @@ export class NewVideoComponent {
   private postService = inject(PostService);
   private authService = inject(AuthService);
 
+  releaseType: 'instant' | 'scheduled' = 'instant';
+
   videoForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required]],
     tags: ['', [Validators.required]],
     location: [''],
     thumbnail: [null, [Validators.required]],
-    videoFile: [null, [Validators.required]]
+    videoFile: [null, [Validators.required]],
+    scheduledStartTime: ['']
   });
 
   videoError: string | null = null;
   thumbnailError: string | null = null;
   maxVideoSize = 200 * 1024 * 1024; // 200MB
+
+  setReleaseType(type: 'instant' | 'scheduled') {
+    this.releaseType = type;
+    if (type === 'instant') {
+      this.videoForm.patchValue({ scheduledStartTime: '' });
+      this.videoForm.get('scheduledStartTime')?.clearValidators();
+    } else {
+      this.videoForm.get('scheduledStartTime')?.setValidators([Validators.required]);
+    }
+    this.videoForm.get('scheduledStartTime')?.updateValueAndValidity();
+  }
 
   onVideoFileChange(event: any) {
     const file = event.target.files[0];
@@ -82,6 +94,7 @@ export class NewVideoComponent {
         description: this.videoForm.value.description,
         tags: this.videoForm.value.tags.split(',').map((t: string) => t.trim()),
         location: this.videoForm.value.location,
+        scheduledStartTime: this.videoForm.value.scheduledStartTime ? new Date(this.videoForm.value.scheduledStartTime) : undefined,
         videoPath: '', // Will be set by server or handled in transactional flow
         thumbnailPath: '', // Will be set by server or handled in transactional flow
         commentsCount: 0,

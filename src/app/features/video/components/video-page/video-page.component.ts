@@ -9,11 +9,12 @@ import { Comment, CommentPage } from '../../../../domain/model/comment.model';
 import { Observable, switchMap, tap, BehaviorSubject, of, catchError } from 'rxjs';
 
 import { StreamChatComponent } from '../stream-chat/stream-chat.component';
+import { VideoPlayerComponent } from '../video-player/video-player.component';
 
 @Component({
     selector: 'app-video-page',
     standalone: true,
-    imports: [CommonModule, RouterModule, StreamChatComponent],
+    imports: [CommonModule, RouterModule, StreamChatComponent, VideoPlayerComponent],
     templateUrl: './video-page.component.html',
     styleUrl: './video-page.component.css'
 })

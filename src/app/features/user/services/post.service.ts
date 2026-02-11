@@ -78,4 +78,16 @@ export class PostService {
   getLikedVideos(): Observable<VideoPost[]> {
     return this.http.get<VideoPost[]>(`${this.baseUrl}/posts/liked`);
   }
+
+  getUserVideos(): Observable<VideoPost[]> {
+    return this.http.get<VideoPost[]>(`${this.baseUrl}/posts/user`);
+  }
+
+  deletePost(postId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/posts/${postId}`);
+  }
+
+  updatePost(postId: number, videoData: VideoPost): Observable<any> {
+    return this.http.put(`${this.baseUrl}/posts/${postId}`, videoData);
+  }
 }
