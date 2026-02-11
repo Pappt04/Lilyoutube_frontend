@@ -4,7 +4,8 @@ import { RouterModule, Router } from '@angular/router';
 import { PostService } from '../user/services/post.service';
 import { Observable, map } from 'rxjs';
 import { VideoPost } from '../../domain/model/video-post.model';
-
+import { AuthService } from '../../core/auth/auth.service';
+import { PopularVideo } from '../../domain/model/popular-video.model';
 import { SecureMediaPipe } from '../../shared/pipes/secure-media.pipe';
 
 @Component({
@@ -16,18 +17,28 @@ import { SecureMediaPipe } from '../../shared/pipes/secure-media.pipe';
 })
 export class HomeComponent implements OnInit {
   private postService = inject(PostService);
+  private authService = inject(AuthService);
   private router = inject(Router);
+
   videos$!: Observable<VideoPost[]>;
+  popularVideos$!: Observable<PopularVideo[]>;
+  isLoggedIn = false;
 
   ngOnInit() {
-  this.videos$ = this.postService.getVideos().pipe(
-    map(videos =>
-      [...videos].sort((a, b) =>
-        new Date(b.createdAt ?? 0 as any).getTime() - new Date(a.createdAt ?? 0 as any).getTime()
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    if (this.isLoggedIn) {
+      this.popularVideos$ = this.postService.getPopularVideos();
+    }
+
+    this.videos$ = this.postService.getVideos().pipe(
+      map(videos =>
+        [...videos].sort((a, b) =>
+          new Date(b.createdAt ?? 0 as any).getTime() - new Date(a.createdAt ?? 0 as any).getTime()
+        )
       )
-    )
-  );
-}
+    );
+  }
 
   navigateToVideo(videoPath: string) {
     let parts = videoPath.split('.');

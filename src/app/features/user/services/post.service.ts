@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from "../../../../environments/environment";
 import { Observable } from 'rxjs';
 import { VideoPost } from '../../../domain/model/video-post.model';
+import { PopularVideo } from '../../../domain/model/popular-video.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,10 @@ export class PostService {
 
   getVideos(): Observable<VideoPost[]> {
     return this.http.get<VideoPost[]>(`${this.baseUrl}/posts`);
+  }
+
+  getPopularVideos(): Observable<PopularVideo[]> {
+    return this.http.get<PopularVideo[]>(`${this.baseUrl}/popular-videos`);
   }
 
   getPostById(id: string): Observable<VideoPost> {
