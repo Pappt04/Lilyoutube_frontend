@@ -1,4 +1,44 @@
 <div class="home-container">
+    @if (isLoggedIn$ | async) {
+    <!-- Popular Videos Section (Only for logged-in users) -->
+    <section class="popular-videos-section">
+        <h2>🔥 Popular Videos</h2>
+        <div class="popular-video-grid">
+            @if (popularVideos$ | async; as popularVideos) {
+                @if (popularVideos.length > 0) {
+                    @for (popularVideo of popularVideos; track popularVideo.id) {
+                    <div class="popular-video-card" (click)="navigateToVideo(popularVideo.post.videoPath)">
+                        <div class="rank-badge">TOP {{ popularVideo.rank }}</div>
+                        <div class="thumbnail">
+                            <img [src]="getThumbnailUrl(popularVideo.post.thumbnailPath) | secureMedia | async"
+                                 alt="{{ popularVideo.post.title }}">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-avatar"></div>
+                            <div class="text-info">
+                                <h3 class="video-title">{{ popularVideo.post.title }}</h3>
+                                <p class="video-meta">
+                                    <a [routerLink]="['/users', popularVideo.post.user_id]"
+                                       (click)="$event.stopPropagation()"
+                                       class="user-link">
+                                        User #{{ popularVideo.post.user_id }}
+                                    </a>
+                                    • {{ popularVideo.post.location || 'Unknown' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                } @else {
+                    <p class="no-data">No popular videos available yet. ETL pipeline will run daily at midnight.</p>
+                }
+            } @else {
+                <p>Loading popular videos...</p>
+            }
+        </div>
+    </section>
+    }
+
     <h1>Recommended Videos</h1>
     <div class="video-grid">
         @if (videos$ | async; as videos) {
