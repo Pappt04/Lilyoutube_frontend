@@ -36,7 +36,7 @@
 }
 
 .status-indicator.connected {
-  background-color: #065fd4;
+  background-color: #CC0000;
 }
 
 .messages-list {
@@ -103,7 +103,7 @@
 
 .chat-input-area button {
   padding: 8px 16px;
-  background-color: #065fd4;
+  background-color: #CC0000;
   color: white;
   border: none;
   border-radius: 18px;
@@ -114,7 +114,7 @@
 }
 
 .chat-input-area button:hover {
-  background-color: #0548a3;
+  background-color: #990000;
 }
 
 .chat-input-area button:disabled {
