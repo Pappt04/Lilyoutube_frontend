@@ -71,3 +71,74 @@
 .user-link:hover {
     text-decoration: underline;
 }
+
+/* Popular Videos Section */
+.popular-videos-section {
+    margin-bottom: 3rem;
+}
+
+.popular-videos-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.popular-video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.popular-video-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.popular-video-card:hover .thumbnail {
+    border-radius: 0;
+}
+
+.rank-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+}
+
+.popular-video-card .video-info {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.popular-video-card .video-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #eee;
+    flex-shrink: 0;
+}
+
+.popularity-score {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+.no-data {
+    color: #666;
+    font-style: italic;
+    padding: 2rem;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 0.5rem;
+}

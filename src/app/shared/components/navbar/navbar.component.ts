@@ -40,6 +40,10 @@ export class NavbarComponent {
     this.router.navigate(['/user/register']);
   }
 
+  goToWatchParty() {
+    this.router.navigate(['/watch-party']);
+  }
+
   onLogoutClick() {
     this.auth.logout();
     this.router.navigate(['']);

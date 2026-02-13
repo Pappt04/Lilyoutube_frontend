@@ -1,0 +1,175 @@
+<div class="watch-party-container">
+  <div class="header">
+    <h1>Watch Party</h1>
+    <p class="subtitle">Watch videos together with friends in real-time</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error()" class="error-banner">
+    {{ error() }}
+  </div>
+
+  <!-- Active Watch Party Section -->
+  <div *ngIf="activeParty()" class="active-party-section">
+    <!-- Party Info Header -->
+    <div class="party-info-header">
+      <div class="party-status">
+        <div class="status-indicator"></div>
+        <span>Active Watch Party</span>
+      </div>
+      <button class="btn btn-secondary btn-small" (click)="leaveParty()">
+        Leave Party
+      </button>
+    </div>
+
+    <!-- Room Info -->
+    <div class="room-info-bar">
+      <div class="room-code-section">
+        <span class="label">Room Code:</span>
+        <span class="room-code">{{ activeParty()?.roomCode }}</span>
+        <button class="copy-btn-small" (click)="copyRoomCode(activeParty()!.roomCode)" title="Copy room code">
+          Copy
+        </button>
+      </div>
+      <div class="members-section">
+        <span class="label">Members ({{ activeParty()?.memberCount }}):</span>
+        <div class="member-list">
+          <span *ngFor="let member of activeParty()?.members" class="member-tag">
+            {{ member.username }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Player Section -->
+    <div class="video-player-section">
+      <div *ngIf="currentVideoUrl()" class="player-container">
+        <div class="player-header">
+          <h3>{{ currentVideoTitle() || 'Now Playing' }}</h3>
+        </div>
+        <app-video-player [videoUrl]="currentVideoUrl()!"></app-video-player>
+      </div>
+
+      <div *ngIf="!currentVideoUrl()" class="no-video-placeholder">
+        <div class="placeholder-content">
+          <svg xmlns="http://www.w3.org/2000/svg" height="64" viewBox="0 -960 960 960" width="64" fill="#666">
+            <path
+              d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm240-40 240-160-240-160v320ZM160-240v-480 480Z" />
+          </svg>
+          <h3>Waiting for video</h3>
+          <p>The party creator will select a video to watch together</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creator Video Link Input -->
+    <div *ngIf="partyState.isCreator()" class="video-link-section">
+      <h3>Share a Video</h3>
+      <p class="section-description">Paste a video link to watch together with your party members</p>
+      <form [formGroup]="videoLinkForm" (ngSubmit)="sendVideoLink()" class="video-link-form">
+        <div class="form-group">
+          <input type="text" formControlName="videoLink"
+            placeholder="Paste video link (e.g. http://localhost:4200/videos/my-video)"
+            class="form-input video-link-input">
+          <button type="submit" class="btn btn-primary"
+            [disabled]="videoLinkForm.invalid || !wsConnected()">
+            Send to Party
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Instructions -->
+    <div class="party-instructions">
+      <p *ngIf="partyState.isCreator()">
+        <strong>You are the party creator.</strong> Paste a video link above and click "Send to Party" to start watching together.
+        <span *ngIf="!wsConnected()" class="ws-warning"> (WebSocket disconnected - reconnecting...)</span>
+      </p>
+      <p *ngIf="!partyState.isCreator()">
+        <strong>Waiting for the party creator</strong> to share a video link. The video will appear here automatically.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!activeParty()" class="content">
+    <!-- Create & Join Section Side by Side -->
+    <div class="action-grid">
+      <!-- Create Watch Party -->
+      <div class="card">
+        <h2>Create Watch Party</h2>
+        <p class="description">Start a new watch party room</p>
+        <form [formGroup]="createForm" (ngSubmit)="onCreateParty()">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="publicRoom" class="checkbox-input">
+              <span>Public room (visible to everyone)</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" [disabled]="isLoading() || createForm.invalid">
+            <span *ngIf="!isLoading()">Create Watch Party</span>
+            <span *ngIf="isLoading()">Creating...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Join Watch Party -->
+      <div class="card">
+        <h2>Join Watch Party</h2>
+        <p class="description">Enter a room code to join</p>
+        <form [formGroup]="joinForm" (ngSubmit)="onJoinParty()">
+          <div class="form-group">
+            <label for="roomCode">Room Code</label>
+            <input type="text" id="roomCode" formControlName="roomCode" placeholder="Enter room code" class="form-input"
+              maxlength="10" [class.invalid]="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched">
+            <div *ngIf="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched"
+              class="validation-error">
+              Please enter a valid room code
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" [disabled]="isLoading() || joinForm.invalid">
+            <span *ngIf="!isLoading()">Join Watch Party</span>
+            <span *ngIf="isLoading()">Joining...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Public Watch Parties List -->
+    <div *ngIf="publicWatchParties().length > 0" class="card">
+      <div class="section-header">
+        <h2>Public Watch Parties</h2>
+        <button class="btn btn-secondary btn-small" (click)="loadPublicWatchParties()" [disabled]="isLoading()">
+          Refresh
+        </button>
+      </div>
+
+      <div class="parties-grid">
+        <div *ngFor="let party of publicWatchParties()" class="party-card" [class.disabled]="isLoading()">
+          <div class="party-header">
+            <span class="party-code">{{ party.roomCode }}</span>
+            <span class="party-members">{{ party.memberCount }} members</span>
+          </div>
+          <div class="party-body">
+            <p class="party-creator">Created by {{ party.creatorUsername }}</p>
+            <p *ngIf="party.currentVideoTitle" class="party-video">
+              Watching: {{ party.currentVideoTitle }}
+            </p>
+          </div>
+          <button class="btn btn-primary btn-small btn-full" (click)="joinPublicParty(party.roomCode)"
+            [disabled]="isLoading()">
+            Join
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="publicWatchParties().length === 0" class="empty-state">
+      <p>No public watch parties available</p>
+      <p class="hint">Create one to get started!</p>
+    </div>
+  </div>
+</div>

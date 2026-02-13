@@ -3,9 +3,10 @@
     <div class="main-content">
         <div class="video-section">
             <div class="player-wrapper">
-                <video controls [src]="getVideoUrl(video.videoPath)" class="video-player" (play)="onVideoPlay()">
-                    Your browser does not support the video tag.
-                </video>
+                <app-video-player [videoUrl]="getVideoUrl(video.videoPath)"
+                    [scheduledStartTime]="video.scheduledStartTime"
+                    (play)="onVideoPlay()">
+                </app-video-player>
             </div>
 
             <div class="video-info">

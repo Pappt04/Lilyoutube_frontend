@@ -1,0 +1,558 @@
+.watch-party-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Banners */
+.error-banner {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c33;
+}
+
+/* Active Watch Party Section */
+.active-party-section {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.party-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.party-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #0f0f0f;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  background: #00c853;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.room-info-bar {
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.room-code-section,
+.members-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.room-code {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #CC0000;
+  background: #f8f9fa;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+}
+
+.copy-btn-small {
+  background: #CC0000;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.copy-btn-small:hover {
+  background: #990000;
+}
+
+.member-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.member-tag {
+  background: #f8f9fa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #0f0f0f;
+  border: 1px solid #dee2e6;
+}
+
+/* Video Player Section */
+.video-player-section {
+  padding: 1.5rem;
+  background: white;
+}
+
+.player-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.player-header {
+  margin-bottom: 1rem;
+}
+
+.player-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+/* No Video Placeholder */
+.no-video-placeholder {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  aspect-ratio: 16/9;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.placeholder-content svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.placeholder-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.placeholder-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Video Link Section (Creator Only) */
+.video-link-section {
+  padding: 1.5rem;
+  background: white;
+  border-top: 1px solid #dee2e6;
+}
+
+.video-link-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.section-description {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.video-link-form .form-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.video-link-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d3d3d3;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.video-link-input:focus {
+  outline: none;
+  border-color: #CC0000;
+}
+
+.video-link-input.invalid {
+  border-color: #c33;
+}
+
+.video-link-form .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
+/* Party Instructions */
+.party-instructions {
+  padding: 1rem 1.5rem;
+  background: #fff9e6;
+  border-top: 1px solid #dee2e6;
+}
+
+.party-instructions p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.party-instructions strong {
+  color: #0f0f0f;
+}
+
+.ws-warning {
+  color: #c33;
+  font-weight: 500;
+}
+
+/* Content Layout */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card Styles - Match existing theme */
+.card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #0f0f0f;
+  margin: 0 0 0.5rem 0;
+}
+
+.description {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: #0f0f0f;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  font-weight: normal;
+}
+
+.checkbox-label:hover {
+  background: #e9ecef;
+}
+
+.checkbox-input {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+  accent-color: #CC0000;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d3d3d3;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #CC0000;
+}
+
+.form-input.invalid {
+  border-color: #c33;
+}
+
+.validation-error {
+  color: #c33;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Button Styles - Match existing theme */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 18px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background-color: #CC0000;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #990000;
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #0f0f0f;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #e5e5e5;
+}
+
+.btn-full {
+  width: 100%;
+  padding: 0.75rem 1rem;
+}
+
+.btn-small {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Parties Grid */
+.parties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.party-card {
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+
+.party-card:hover:not(.disabled) {
+  border-color: #CC0000;
+  box-shadow: 0 2px 8px rgba(204, 0, 0, 0.1);
+}
+
+.party-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.party-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.party-code {
+  font-family: monospace;
+  font-weight: bold;
+  color: #CC0000;
+  font-size: 1rem;
+}
+
+.party-members {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.party-body {
+  margin-bottom: 1rem;
+}
+
+.party-body p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.party-creator {
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.party-video {
+  color: #666;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 0.75rem;
+}
+
+.empty-state p {
+  margin: 0 0 0.5rem 0;
+}
+
+.hint {
+  font-size: 0.875rem;
+  color: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .watch-party-container {
+    padding: 1rem;
+  }
+
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .parties-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-code-section,
+  .members-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .party-info-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .room-info-bar {
+    padding: 1rem;
+  }
+
+  .video-player-section {
+    padding: 1rem;
+  }
+
+  .party-instructions {
+    padding: 1rem;
+  }
+
+  .placeholder-content {
+    padding: 1rem;
+  }
+
+  .placeholder-content svg {
+    width: 48px;
+    height: 48px;
+  }
+}

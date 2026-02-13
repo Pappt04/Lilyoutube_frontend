@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from "../../../../environments/environment";
 import { Observable } from 'rxjs';
 import { VideoPost } from '../../../domain/model/video-post.model';
+import { PopularVideo } from '../../../domain/model/popular-video.model';
 
 @Injectable({
   providedIn: 'root'
@@ -77,5 +78,21 @@ export class PostService {
 
   getLikedVideos(): Observable<VideoPost[]> {
     return this.http.get<VideoPost[]>(`${this.baseUrl}/posts/liked`);
+  }
+
+  getUserVideos(): Observable<VideoPost[]> {
+    return this.http.get<VideoPost[]>(`${this.baseUrl}/posts/user`);
+  }
+
+  deletePost(postId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/posts/${postId}`);
+  }
+
+  updatePost(postId: number, videoData: VideoPost): Observable<any> {
+    return this.http.put(`${this.baseUrl}/posts/${postId}`, videoData);
+  }
+
+  getPopularVideos(): Observable<PopularVideo[]> {
+    return this.http.get<PopularVideo[]>(`${this.baseUrl}/popular-videos`);
   }
 }
