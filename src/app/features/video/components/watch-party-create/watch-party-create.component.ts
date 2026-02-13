@@ -5,12 +5,14 @@ import { Router } from '@angular/router';
 import { WatchPartyService } from '../../services/watch-party.service';
 import { WatchPartyWebSocketService } from '../../services/watch-party-websocket.service';
 import { WatchPartyStateService } from '../../services/watch-party-state.service';
+import { VideoPlayerComponent } from '../video-player/video-player.component';
+import { PostService } from '../../../user/services/post.service';
 import { WatchParty } from '../../../../domain/model/watch-party.model';
 
 @Component({
   selector: 'app-watch-party-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, VideoPlayerComponent],
   templateUrl: './watch-party-create.component.html',
   styleUrl: './watch-party-create.component.css'
 })
@@ -19,11 +21,18 @@ export class WatchPartyCreateComponent implements OnDestroy {
   private router = inject(Router);
   private watchPartyService = inject(WatchPartyService);
   private wsService = inject(WatchPartyWebSocketService);
-  private partyState = inject(WatchPartyStateService);
+  private postService = inject(PostService);
+
+  // Public for template access
+  partyState = inject(WatchPartyStateService);
 
   isLoading = signal(false);
   error = signal<string | null>(null);
   publicWatchParties = signal<WatchParty[]>([]);
+
+  // Current video being watched in the party
+  currentVideoUrl = signal<string | null>(null);
+  currentVideoTitle = signal<string | null>(null);
 
   // Use the shared state for active party
   activeParty = this.partyState.activeParty;
@@ -57,9 +66,8 @@ export class WatchPartyCreateComponent implements OnDestroy {
         if (message.type === 'VIDEO_CHANGE') {
           console.log('Received video change notification:', message);
 
-          // Navigate to the video page that the party creator selected
-          // This will automatically open the video for all party members
-          this.router.navigate(['/videos', message.videoPath]);
+          // Load the video in the embedded player instead of navigating
+          this.loadVideoInPlayer(message.videoPath, message.videoPath);
         }
       },
       error: (err) => {
@@ -70,9 +78,55 @@ export class WatchPartyCreateComponent implements OnDestroy {
     this.wsService.connectionStatus$.subscribe({
       next: (connected) => {
         console.log('WebSocket connection status:', connected);
+        if (connected) {
+          // Load current video when connected
+          this.loadCurrentPartyVideo();
+        }
       },
       error: (err) => {
         console.error('WebSocket connection error:', err);
+      }
+    });
+  }
+
+  /**
+   * Load current video from the active party
+   */
+  loadCurrentPartyVideo() {
+    const party = this.activeParty();
+    if (party && party.currentVideoId) {
+      // Get video details from backend
+      this.postService.getPostById(party.currentVideoId.toString()).subscribe({
+        next: (video) => {
+          this.loadVideoInPlayer(video.videoPath, party.currentVideoTitle!);
+        },
+        error: (err) => {
+          console.error('Error loading party video:', err);
+        }
+      });
+    }
+  }
+
+  /**
+   * Load video in the embedded player
+   */
+  loadVideoInPlayer(videoPath: string, videoId: string) {
+    // Remove file extension if present
+    let cleanPath = videoPath.split('.')[0];
+
+    // Construct video URL
+    const videoUrl = this.postService.getVideoUrl(cleanPath + '.m3u8');
+    this.currentVideoUrl.set(videoUrl);
+
+    // Fetch video title
+    this.postService.getPostById(videoId.toString()).subscribe({
+      next: (video) => {
+        this.currentVideoTitle.set(video.title);
+        console.log('Loaded video in player:', video.title);
+      },
+      error: (err) => {
+        console.error('Error fetching video details:', err);
+        this.currentVideoTitle.set('Video #' + videoId);
       }
     });
   }
@@ -112,6 +166,11 @@ export class WatchPartyCreateComponent implements OnDestroy {
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
 
+        // Load current video if exists
+        if (party.currentVideoId) {
+          this.loadCurrentPartyVideo();
+        }
+
         // Refresh public parties list
         this.loadPublicWatchParties();
       },
@@ -144,6 +203,11 @@ export class WatchPartyCreateComponent implements OnDestroy {
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
 
+        // Load current video if exists
+        if (party.currentVideoId) {
+          this.loadCurrentPartyVideo();
+        }
+
         // Reset form
         this.joinForm.reset();
       },
@@ -169,6 +233,11 @@ export class WatchPartyCreateComponent implements OnDestroy {
 
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
+
+        // Load current video if exists
+        if (party.currentVideoId) {
+          this.loadCurrentPartyVideo();
+        }
       },
       error: (err) => {
         this.isLoading.set(false);

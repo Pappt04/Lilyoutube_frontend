@@ -47,9 +47,9 @@ export class HomeComponent implements OnInit {
     }
 
     // If in a watch party and user is the creator, notify all members
-    if (videoId && this.partyState.isCreator()) {
+    if (this.partyState.isCreator()) {
       console.log('Watch party creator selecting video, notifying members');
-      this.partyState.notifyVideoChange(videoId, videoPath);
+      this.partyState.notifyVideoChange(videoPath);
     }
 
     this.router.navigate(['/videos', videoPath]);

@@ -52,7 +52,7 @@ export class WatchPartyStateService {
    * Notify all party members when the creator selects a video
    * This is called when navigating to a video page
    */
-  notifyVideoChange(videoId: number, videoPath: string) {
+  notifyVideoChange(videoPath: string) {
     const party = this.activeParty();
 
     if (!party) {
@@ -65,16 +65,19 @@ export class WatchPartyStateService {
       return;
     }
 
-    console.log('Party creator navigating to video, notifying members:', videoPath);
+    console.log('Party creator selecting video, notifying members:', videoPath);
 
-    // Update the current video in the backend
-    this.watchPartyService.updateCurrentVideo(party.roomCode, videoId).subscribe({
+    // Clean video path (remove extension if present)
+    const cleanPath = videoPath.split('.')[0];
+
+    // Update the current video in the backend using video path
+    this.watchPartyService.updateCurrentVideoByPath(party.roomCode, cleanPath).subscribe({
       next: (updatedParty) => {
         console.log('Watch party updated with new video:', updatedParty);
         this.activeParty.set(updatedParty);
 
         // Send WebSocket message to all members
-        this.wsService.sendVideoChange(party.roomCode, videoId, videoPath);
+        this.wsService.sendVideoChange(party.roomCode, cleanPath);
       },
       error: (err) => {
         console.error('Failed to update watch party video:', err);

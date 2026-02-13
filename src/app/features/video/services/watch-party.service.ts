@@ -46,6 +46,13 @@ export class WatchPartyService {
   }
 
   /**
+   * Update the current video in a watch party by video path
+   */
+  updateCurrentVideoByPath(roomCode: string, videoPath: string): Observable<WatchParty> {
+    return this.http.put<WatchParty>(`${this.baseUrl}/${roomCode}/video/${videoPath}`, {});
+  }
+
+  /**
    * Get watch party details by room code
    */
   getWatchParty(roomCode: string): Observable<WatchParty> {

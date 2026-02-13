@@ -5,7 +5,6 @@ import { AuthService } from '../../../core/auth/auth.service';
 export interface VideoSyncMessage {
   type: 'VIDEO_CHANGE';
   roomCode: string;
-  videoId: number;
   videoPath: string;
   userId: string;
   username: string;
@@ -32,14 +31,24 @@ export class WatchPartyWebSocketService {
       return;
     }
 
-    const token = this.authService.getToken();
+    let token = this.authService.getToken();
     if (!token) {
       console.error('No auth token available');
       return;
     }
 
+    // Parse token if it's in JSON format {"token":"..."}
+    try {
+      const parsed = JSON.parse(token);
+      if (parsed.token) {
+        token = parsed.token;
+      }
+    } catch (e) {
+      // Token is already a plain string, use as-is
+    }
+
     // WebSocket URL - adjust based on your backend configuration
-    const wsUrl = `ws://localhost:8888/ws/watchparty/${roomCode}?token=${encodeURIComponent(token)}`;
+    const wsUrl = `ws://localhost:8888/ws/watchparty/${roomCode}?token=${encodeURIComponent(token || "")}`;
 
     try {
       this.socket = new WebSocket(wsUrl);
@@ -78,7 +87,7 @@ export class WatchPartyWebSocketService {
   /**
    * Send a video change message to all room members
    */
-  sendVideoChange(roomCode: string, videoId: number, videoPath: string): void {
+  sendVideoChange(roomCode: string, videoPath: string): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       console.error('WebSocket is not connected');
       return;
@@ -87,7 +96,6 @@ export class WatchPartyWebSocketService {
     const message: VideoSyncMessage = {
       type: 'VIDEO_CHANGE',
       roomCode,
-      videoId,
       videoPath,
       userId: (this.authService.currentUser()?.id || 0).toString(),
       username: this.authService.currentUser()?.username || 'Unknown'
