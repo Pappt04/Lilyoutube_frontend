@@ -25,10 +25,3 @@ export interface CreateWatchPartyRequest {
 export interface JoinWatchPartyRequest {
   roomCode: string;
 }
-
-export interface VideoSyncMessage {
-  roomCode: string;
-  action: 'play' | 'pause' | 'seek';
-  timestamp: number;
-  videoId?: number;
-}

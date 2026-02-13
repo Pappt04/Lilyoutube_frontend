@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ElementRef, ViewChild, AfterViewInit, PLATFORM_ID, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import Hls from 'hls.js';
 
@@ -9,7 +9,7 @@ import Hls from 'hls.js';
     templateUrl: './video-player.component.html',
     styleUrl: './video-player.component.css'
 })
-export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
+export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
     @Input() videoUrl: string = '';
     @Input() scheduledStartTime?: Date;
     @Output() play = new EventEmitter<void>();
@@ -27,6 +27,20 @@ export class VideoPlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         this.checkScheduledStatus();
         if (this.isScheduled) {
             this.startCountdown();
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['videoUrl'] && !changes['videoUrl'].firstChange && isPlatformBrowser(this.platformId)) {
+            // Video URL changed - reinitialize the player with the new source
+            if (this.hls) {
+                this.hls.destroy();
+                this.hls = null;
+            }
+            this.playEventEmitted = false;
+            if (this.videoUrl && this.videoElementRef) {
+                this.initPlayer();
+            }
         }
     }
 

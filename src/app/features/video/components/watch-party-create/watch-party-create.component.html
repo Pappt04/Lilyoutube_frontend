@@ -69,16 +69,12 @@
       <form [formGroup]="videoLinkForm" (ngSubmit)="sendVideoLink()" class="video-link-form">
         <div class="form-group">
           <input type="text" formControlName="videoLink"
-            placeholder="Paste video link here (e.g., http://localhost:4200/video/video-name or just video-name)"
-            class="form-input video-link-input"
-            [class.invalid]="videoLinkForm.get('videoLink')?.invalid && videoLinkForm.get('videoLink')?.touched">
-          <button type="submit" class="btn btn-primary" [disabled]="videoLinkForm.invalid">
+            placeholder="Paste video link (e.g. http://localhost:4200/videos/my-video)"
+            class="form-input video-link-input">
+          <button type="submit" class="btn btn-primary"
+            [disabled]="videoLinkForm.invalid || !wsConnected()">
             Send to Party
           </button>
-        </div>
-        <div *ngIf="videoLinkForm.get('videoLink')?.invalid && videoLinkForm.get('videoLink')?.touched"
-          class="validation-error">
-          Please enter a valid video link
         </div>
       </form>
     </div>
@@ -86,11 +82,11 @@
     <!-- Instructions -->
     <div class="party-instructions">
       <p *ngIf="partyState.isCreator()">
-        <strong>You are the party creator.</strong> Paste a video link above, or navigate to the home page and click on
-        any video to start watching together.
+        <strong>You are the party creator.</strong> Paste a video link above and click "Send to Party" to start watching together.
+        <span *ngIf="!wsConnected()" class="ws-warning"> (WebSocket disconnected - reconnecting...)</span>
       </p>
       <p *ngIf="!partyState.isCreator()">
-        <strong>Waiting for the party creator</strong> to select a video. The video will appear automatically.
+        <strong>Waiting for the party creator</strong> to share a video link. The video will appear here automatically.
       </p>
     </div>
   </div>

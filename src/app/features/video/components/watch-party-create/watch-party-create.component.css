@@ -268,6 +268,11 @@
   color: #0f0f0f;
 }
 
+.ws-warning {
+  color: #c33;
+  font-weight: 500;
+}
+
 /* Content Layout */
 .content {
   display: flex;

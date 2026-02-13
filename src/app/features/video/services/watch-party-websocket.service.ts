@@ -64,7 +64,14 @@ export class WatchPartyWebSocketService {
 
       this.socket.onmessage = (event) => {
         try {
-          const message: VideoSyncMessage = JSON.parse(event.data);
+          const data = JSON.parse(event.data);
+
+          // Ignore heartbeat messages (same as chat)
+          if (data && data.type === 'heartbeat') {
+            return;
+          }
+
+          const message: VideoSyncMessage = data;
           console.log('Received WebSocket message:', message);
           this.messageSubject.next(message);
         } catch (error) {

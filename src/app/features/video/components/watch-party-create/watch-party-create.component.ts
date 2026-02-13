@@ -1,13 +1,13 @@
-import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { WatchPartyService } from '../../services/watch-party.service';
 import { WatchPartyWebSocketService } from '../../services/watch-party-websocket.service';
 import { WatchPartyStateService } from '../../services/watch-party-state.service';
 import { VideoPlayerComponent } from '../video-player/video-player.component';
 import { PostService } from '../../../user/services/post.service';
 import { WatchParty } from '../../../../domain/model/watch-party.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-watch-party-create',
@@ -16,12 +16,12 @@ import { WatchParty } from '../../../../domain/model/watch-party.model';
   templateUrl: './watch-party-create.component.html',
   styleUrl: './watch-party-create.component.css'
 })
-export class WatchPartyCreateComponent implements OnDestroy {
+export class WatchPartyCreateComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
-  private router = inject(Router);
   private watchPartyService = inject(WatchPartyService);
   private wsService = inject(WatchPartyWebSocketService);
   private postService = inject(PostService);
+  private subscriptions: Subscription[] = [];
 
   // Public for template access
   partyState = inject(WatchPartyStateService);
@@ -33,6 +33,9 @@ export class WatchPartyCreateComponent implements OnDestroy {
   // Current video being watched in the party
   currentVideoUrl = signal<string | null>(null);
   currentVideoTitle = signal<string | null>(null);
+
+  // WebSocket connection status
+  wsConnected = signal(false);
 
   // Use the shared state for active party
   activeParty = this.partyState.activeParty;
@@ -55,84 +58,82 @@ export class WatchPartyCreateComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    // Disconnect WebSocket when component is destroyed
+    this.subscriptions.forEach(s => s.unsubscribe());
     if (this.activeParty()) {
       this.wsService.disconnect();
     }
   }
 
   /**
-   * Setup WebSocket listener for video changes
+   * Setup WebSocket listener for video changes (works like the live chat listener)
    */
   setupWebSocketListener() {
-    this.wsService.messages$.subscribe({
+    const msgSub = this.wsService.messages$.subscribe({
       next: (message) => {
-        if (message.type === 'VIDEO_CHANGE') {
-          console.log('Received video change notification:', message);
-
-          // Load the video in the embedded player instead of navigating
-          this.loadVideoInPlayer(message.videoPath, message.videoPath);
+        console.log('Received WebSocket message:', message);
+        if (message.type === 'VIDEO_CHANGE' && message.videoPath) {
+          console.log('Video change received, loading:', message.videoPath);
+          this.loadVideoInPlayer(message.videoPath);
         }
       },
       error: (err) => {
         console.error('WebSocket message error:', err);
       }
     });
+    this.subscriptions.push(msgSub);
 
-    this.wsService.connectionStatus$.subscribe({
+    const connSub = this.wsService.connectionStatus$.subscribe({
       next: (connected) => {
         console.log('WebSocket connection status:', connected);
-        if (connected) {
-          // Load current video when connected
-          this.loadCurrentPartyVideo();
-        }
+        this.wsConnected.set(connected);
       },
       error: (err) => {
         console.error('WebSocket connection error:', err);
       }
     });
+    this.subscriptions.push(connSub);
   }
 
   /**
-   * Load current video from the active party
+   * Load video in the embedded player by video path
    */
-  loadCurrentPartyVideo() {
-    const party = this.activeParty();
-    if (party && party.currentVideoId) {
-      // Get video details from backend
-      this.postService.getPostById(party.currentVideoId.toString()).subscribe({
-        next: (video) => {
-          this.loadVideoInPlayer(video.videoPath, party.currentVideoTitle!);
-        },
-        error: (err) => {
-          console.error('Error loading party video:', err);
-        }
-      });
-    }
-  }
+  loadVideoInPlayer(videoPath: string) {
+    // Clean the path: remove extensions like .m3u8, .mp4, etc.
+    let cleanPath = videoPath.replace(/\.(m3u8|mp4|webm|mkv|avi)$/i, '');
 
-  /**
-   * Load video in the embedded player
-   */
-  loadVideoInPlayer(videoPath: string, videoId: string) {
-    // Remove file extension if present
-    let cleanPath = videoPath.split('.')[0];
-
-    // Construct video URL
+    // Construct the HLS stream URL
     const videoUrl = this.postService.getVideoUrl(cleanPath + '.m3u8');
     this.currentVideoUrl.set(videoUrl);
+    this.currentVideoTitle.set(cleanPath);
+    console.log('Playing video:', videoUrl);
+  }
 
-    // Fetch video title
-    this.postService.getPostById(videoId.toString()).subscribe({
-      next: (video) => {
-        this.currentVideoTitle.set(video.title);
-        console.log('Loaded video in player:', video.title);
-      },
-      error: (err) => {
-        console.error('Error fetching video details:', err);
-        this.currentVideoTitle.set('Video #' + videoId);
-      }
-    });
+  /**
+   * Extract video path from various URL formats:
+   * - http://localhost:4200/videos/my-video
+   * - /videos/my-video
+   * - my-video
+   * - my-video.m3u8
+   */
+  extractVideoPath(link: string): string {
+    let path = link.trim();
+
+    // If it contains /videos/, extract everything after it
+    const videosIdx = path.indexOf('/videos/');
+    if (videosIdx !== -1) {
+      path = path.substring(videosIdx + '/videos/'.length);
+    }
+
+    // Remove query parameters and hash
+    path = path.split('?')[0].split('#')[0];
+
+    // Remove trailing slashes
+    path = path.replace(/\/+$/, '');
+
+    // Remove common video extensions
+    path = path.replace(/\.(m3u8|mp4|webm|mkv|avi)$/i, '');
+
+    return path;
   }
 
   /**
@@ -170,10 +171,9 @@ export class WatchPartyCreateComponent implements OnDestroy {
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
 
-        // Load current video if exists
-        if (party.currentVideoId) {
-          this.loadCurrentPartyVideo();
-        }
+        // Reset video state for new party
+        this.currentVideoUrl.set(null);
+        this.currentVideoTitle.set(null);
 
         // Refresh public parties list
         this.loadPublicWatchParties();
@@ -207,10 +207,9 @@ export class WatchPartyCreateComponent implements OnDestroy {
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
 
-        // Load current video if exists
-        if (party.currentVideoId) {
-          this.loadCurrentPartyVideo();
-        }
+        // Reset video state
+        this.currentVideoUrl.set(null);
+        this.currentVideoTitle.set(null);
 
         // Reset form
         this.joinForm.reset();
@@ -238,10 +237,9 @@ export class WatchPartyCreateComponent implements OnDestroy {
         // Set active party in shared state (this will also connect WebSocket)
         this.partyState.setActiveParty(party);
 
-        // Load current video if exists
-        if (party.currentVideoId) {
-          this.loadCurrentPartyVideo();
-        }
+        // Reset video state
+        this.currentVideoUrl.set(null);
+        this.currentVideoTitle.set(null);
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -266,6 +264,10 @@ export class WatchPartyCreateComponent implements OnDestroy {
 
         // Clear active party in shared state (this will also disconnect WebSocket)
         this.partyState.clearActiveParty();
+
+        // Reset video state
+        this.currentVideoUrl.set(null);
+        this.currentVideoTitle.set(null);
 
         // Refresh public parties list
         this.loadPublicWatchParties();
@@ -293,7 +295,7 @@ export class WatchPartyCreateComponent implements OnDestroy {
   }
 
   /**
-   * Send video link to all party members (creator only)
+   * Send video link to all party members via WebSocket (like sending a chat message)
    */
   sendVideoLink() {
     if (this.videoLinkForm.invalid || !this.partyState.isCreator()) {
@@ -308,27 +310,29 @@ export class WatchPartyCreateComponent implements OnDestroy {
       return;
     }
 
-    // Extract video path from link
-    // Assuming link format: http://localhost:4200/video/{videoPath}
-    let videoPath = videoLink;
-
-    // If it's a full URL, extract the path
-    if (videoLink.includes('/video/')) {
-      const parts = videoLink.split('/video/');
-      if (parts.length > 1) {
-        videoPath = parts[1];
-      }
+    if (!this.wsService.isConnected()) {
+      this.error.set('WebSocket not connected. Try leaving and rejoining the party.');
+      return;
     }
 
-    console.log('Sending video link:', videoPath);
+    // Extract the video path from whatever URL format was pasted
+    const videoPath = this.extractVideoPath(videoLink);
 
-    // Send via WebSocket
+    if (!videoPath) {
+      this.error.set('Could not extract a valid video name from the link.');
+      return;
+    }
+
+    console.log('Sending video link to party:', videoPath);
+
+    // Send via WebSocket to all other members (like chat sends messages)
     this.wsService.sendVideoChange(party.roomCode, videoPath);
 
     // Also load it locally for the creator
-    this.loadVideoInPlayer(videoPath, videoPath);
+    this.loadVideoInPlayer(videoPath);
 
-    // Clear the input
+    // Clear error and input
+    this.error.set(null);
     this.videoLinkForm.reset();
   }
 }
