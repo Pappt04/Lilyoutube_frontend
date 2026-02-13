@@ -27,10 +27,7 @@
       <div class="room-code-section">
         <span class="label">Room Code:</span>
         <span class="room-code">{{ activeParty()?.roomCode }}</span>
-        <button
-          class="copy-btn-small"
-          (click)="copyRoomCode(activeParty()!.roomCode)"
-          title="Copy room code">
+        <button class="copy-btn-small" (click)="copyRoomCode(activeParty()!.roomCode)" title="Copy room code">
           Copy
         </button>
       </div>
@@ -56,7 +53,8 @@
       <div *ngIf="!currentVideoUrl()" class="no-video-placeholder">
         <div class="placeholder-content">
           <svg xmlns="http://www.w3.org/2000/svg" height="64" viewBox="0 -960 960 960" width="64" fill="#666">
-            <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm240-40 240-160-240-160v320ZM160-240v-480 480Z"/>
+            <path
+              d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm240-40 240-160-240-160v320ZM160-240v-480 480Z" />
           </svg>
           <h3>Waiting for video</h3>
           <p>The party creator will select a video to watch together</p>
@@ -64,10 +62,32 @@
       </div>
     </div>
 
+    <!-- Creator Video Link Input -->
+    <div *ngIf="partyState.isCreator()" class="video-link-section">
+      <h3>Share a Video</h3>
+      <p class="section-description">Paste a video link to watch together with your party members</p>
+      <form [formGroup]="videoLinkForm" (ngSubmit)="sendVideoLink()" class="video-link-form">
+        <div class="form-group">
+          <input type="text" formControlName="videoLink"
+            placeholder="Paste video link here (e.g., http://localhost:4200/video/video-name or just video-name)"
+            class="form-input video-link-input"
+            [class.invalid]="videoLinkForm.get('videoLink')?.invalid && videoLinkForm.get('videoLink')?.touched">
+          <button type="submit" class="btn btn-primary" [disabled]="videoLinkForm.invalid">
+            Send to Party
+          </button>
+        </div>
+        <div *ngIf="videoLinkForm.get('videoLink')?.invalid && videoLinkForm.get('videoLink')?.touched"
+          class="validation-error">
+          Please enter a valid video link
+        </div>
+      </form>
+    </div>
+
     <!-- Instructions -->
     <div class="party-instructions">
       <p *ngIf="partyState.isCreator()">
-        <strong>You are the party creator.</strong> Navigate to the home page and click on any video to start watching together.
+        <strong>You are the party creator.</strong> Paste a video link above, or navigate to the home page and click on
+        any video to start watching together.
       </p>
       <p *ngIf="!partyState.isCreator()">
         <strong>Waiting for the party creator</strong> to select a video. The video will appear automatically.
@@ -86,18 +106,12 @@
         <form [formGroup]="createForm" (ngSubmit)="onCreateParty()">
           <div class="form-group">
             <label class="checkbox-label">
-              <input
-                type="checkbox"
-                formControlName="publicRoom"
-                class="checkbox-input">
+              <input type="checkbox" formControlName="publicRoom" class="checkbox-input">
               <span>Public room (visible to everyone)</span>
             </label>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary btn-full"
-            [disabled]="isLoading() || createForm.invalid">
+          <button type="submit" class="btn btn-primary btn-full" [disabled]="isLoading() || createForm.invalid">
             <span *ngIf="!isLoading()">Create Watch Party</span>
             <span *ngIf="isLoading()">Creating...</span>
           </button>
@@ -111,25 +125,15 @@
         <form [formGroup]="joinForm" (ngSubmit)="onJoinParty()">
           <div class="form-group">
             <label for="roomCode">Room Code</label>
-            <input
-              type="text"
-              id="roomCode"
-              formControlName="roomCode"
-              placeholder="Enter room code"
-              class="form-input"
-              maxlength="10"
-              [class.invalid]="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched">
-            <div
-              *ngIf="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched"
+            <input type="text" id="roomCode" formControlName="roomCode" placeholder="Enter room code" class="form-input"
+              maxlength="10" [class.invalid]="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched">
+            <div *ngIf="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched"
               class="validation-error">
               Please enter a valid room code
             </div>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary btn-full"
-            [disabled]="isLoading() || joinForm.invalid">
+          <button type="submit" class="btn btn-primary btn-full" [disabled]="isLoading() || joinForm.invalid">
             <span *ngIf="!isLoading()">Join Watch Party</span>
             <span *ngIf="isLoading()">Joining...</span>
           </button>
@@ -141,19 +145,13 @@
     <div *ngIf="publicWatchParties().length > 0" class="card">
       <div class="section-header">
         <h2>Public Watch Parties</h2>
-        <button
-          class="btn btn-secondary btn-small"
-          (click)="loadPublicWatchParties()"
-          [disabled]="isLoading()">
+        <button class="btn btn-secondary btn-small" (click)="loadPublicWatchParties()" [disabled]="isLoading()">
           Refresh
         </button>
       </div>
 
       <div class="parties-grid">
-        <div
-          *ngFor="let party of publicWatchParties()"
-          class="party-card"
-          [class.disabled]="isLoading()">
+        <div *ngFor="let party of publicWatchParties()" class="party-card" [class.disabled]="isLoading()">
           <div class="party-header">
             <span class="party-code">{{ party.roomCode }}</span>
             <span class="party-members">{{ party.memberCount }} members</span>
@@ -164,9 +162,7 @@
               Watching: {{ party.currentVideoTitle }}
             </p>
           </div>
-          <button
-            class="btn btn-primary btn-small btn-full"
-            (click)="joinPublicParty(party.roomCode)"
+          <button class="btn btn-primary btn-small btn-full" (click)="joinPublicParty(party.roomCode)"
             [disabled]="isLoading()">
             Join
           </button>

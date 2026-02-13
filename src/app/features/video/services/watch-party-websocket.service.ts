@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
+import { environment } from '../../../../environments/environment';
 
 export interface VideoSyncMessage {
   type: 'VIDEO_CHANGE';
@@ -47,8 +48,11 @@ export class WatchPartyWebSocketService {
       // Token is already a plain string, use as-is
     }
 
-    // WebSocket URL - adjust based on your backend configuration
-    const wsUrl = `ws://localhost:8888/ws/watchparty/${roomCode}?token=${encodeURIComponent(token || "")}`;
+    // WebSocket URL - following the same pattern as chat WebSocket
+    const apiBase = environment.apiUrl;  // 'http://localhost:8888/api'
+    const wsProtocol = apiBase.startsWith('https') ? 'wss:' : 'ws:';
+    const wsHost = apiBase.replace(/^https?:\/\//, '').split('/api')[0];  // Extract 'localhost:8888'
+    const wsUrl = `${wsProtocol}//${wsHost}/api/watchparty/${roomCode}/ws?token=${encodeURIComponent(token || "")}`;
 
     try {
       this.socket = new WebSocket(wsUrl);

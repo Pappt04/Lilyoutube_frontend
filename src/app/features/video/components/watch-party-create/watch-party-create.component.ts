@@ -45,6 +45,10 @@ export class WatchPartyCreateComponent implements OnDestroy {
     roomCode: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  videoLinkForm: FormGroup = this.fb.group({
+    videoLink: ['', [Validators.required]]
+  });
+
   ngOnInit() {
     this.loadPublicWatchParties();
     this.setupWebSocketListener();
@@ -287,4 +291,45 @@ export class WatchPartyCreateComponent implements OnDestroy {
       console.error('Failed to copy room code:', err);
     });
   }
+
+  /**
+   * Send video link to all party members (creator only)
+   */
+  sendVideoLink() {
+    if (this.videoLinkForm.invalid || !this.partyState.isCreator()) {
+      return;
+    }
+
+    const videoLink = this.videoLinkForm.value.videoLink.trim();
+    const party = this.activeParty();
+
+    if (!party) {
+      this.error.set('No active party');
+      return;
+    }
+
+    // Extract video path from link
+    // Assuming link format: http://localhost:4200/video/{videoPath}
+    let videoPath = videoLink;
+
+    // If it's a full URL, extract the path
+    if (videoLink.includes('/video/')) {
+      const parts = videoLink.split('/video/');
+      if (parts.length > 1) {
+        videoPath = parts[1];
+      }
+    }
+
+    console.log('Sending video link:', videoPath);
+
+    // Send via WebSocket
+    this.wsService.sendVideoChange(party.roomCode, videoPath);
+
+    // Also load it locally for the creator
+    this.loadVideoInPlayer(videoPath, videoPath);
+
+    // Clear the input
+    this.videoLinkForm.reset();
+  }
 }
+

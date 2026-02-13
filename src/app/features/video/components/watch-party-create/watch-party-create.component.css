@@ -200,6 +200,57 @@
   color: #666;
 }
 
+/* Video Link Section (Creator Only) */
+.video-link-section {
+  padding: 1.5rem;
+  background: white;
+  border-top: 1px solid #dee2e6;
+}
+
+.video-link-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+.section-description {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.video-link-form .form-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.video-link-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d3d3d3;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.video-link-input:focus {
+  outline: none;
+  border-color: #CC0000;
+}
+
+.video-link-input.invalid {
+  border-color: #c33;
+}
+
+.video-link-form .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
 /* Party Instructions */
 .party-instructions {
   padding: 1rem 1.5rem;
