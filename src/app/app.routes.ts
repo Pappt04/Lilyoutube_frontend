@@ -35,6 +35,15 @@ export const routes: Routes = [
   { path: 'my-channel', component: MyChannelComponent, canActivate: [authGuard] },
   { path: 'my-channel/new-video', component: NewVideoComponent, canActivate: [authGuard] },
 
+  // watch party routes
+  {
+    path: 'watch-party',
+    loadComponent: () =>
+      import('./features/video/components/watch-party-create/watch-party-create.component')
+        .then(m => m.WatchPartyCreateComponent),
+    canActivate: [authGuard]
+  },
+
   // fallback
   { path: '**', redirectTo: 'home' }
 ];

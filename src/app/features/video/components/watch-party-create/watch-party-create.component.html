@@ -1,0 +1,148 @@
+<div class="watch-party-container">
+  <div class="header">
+    <h1>Watch Party</h1>
+    <p class="subtitle">Watch videos together with friends in real-time</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error()" class="error-banner">
+    {{ error() }}
+  </div>
+
+  <!-- Success Message - Don't redirect, show the room info -->
+  <div *ngIf="activeParty()" class="active-party-banner">
+    <div class="party-status">
+      <div class="status-indicator"></div>
+      <span>Active Watch Party</span>
+    </div>
+    <div class="room-info">
+      <div class="room-code-section">
+        <span class="label">Room Code:</span>
+        <span class="room-code">{{ activeParty()?.roomCode }}</span>
+        <button
+          class="copy-btn"
+          (click)="copyRoomCode(activeParty()!.roomCode)"
+          title="Copy room code">
+          Copy
+        </button>
+      </div>
+      <div class="members-section">
+        <span class="label">Members ({{ activeParty()?.memberCount }}):</span>
+        <div class="member-list">
+          <span *ngFor="let member of activeParty()?.members" class="member-tag">
+            {{ member.username }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" (click)="leaveParty()">
+      Leave Watch Party
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!activeParty()" class="content">
+    <!-- Create & Join Section Side by Side -->
+    <div class="action-grid">
+      <!-- Create Watch Party -->
+      <div class="card">
+        <h2>Create Watch Party</h2>
+        <p class="description">Start a new watch party room</p>
+        <form [formGroup]="createForm" (ngSubmit)="onCreateParty()">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="publicRoom"
+                class="checkbox-input">
+              <span>Public room (visible to everyone)</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-full"
+            [disabled]="isLoading() || createForm.invalid">
+            <span *ngIf="!isLoading()">Create Watch Party</span>
+            <span *ngIf="isLoading()">Creating...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Join Watch Party -->
+      <div class="card">
+        <h2>Join Watch Party</h2>
+        <p class="description">Enter a room code to join</p>
+        <form [formGroup]="joinForm" (ngSubmit)="onJoinParty()">
+          <div class="form-group">
+            <label for="roomCode">Room Code</label>
+            <input
+              type="text"
+              id="roomCode"
+              formControlName="roomCode"
+              placeholder="Enter room code"
+              class="form-input"
+              maxlength="10"
+              [class.invalid]="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched">
+            <div
+              *ngIf="joinForm.get('roomCode')?.invalid && joinForm.get('roomCode')?.touched"
+              class="validation-error">
+              Please enter a valid room code
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-full"
+            [disabled]="isLoading() || joinForm.invalid">
+            <span *ngIf="!isLoading()">Join Watch Party</span>
+            <span *ngIf="isLoading()">Joining...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Public Watch Parties List -->
+    <div *ngIf="publicWatchParties().length > 0" class="card">
+      <div class="section-header">
+        <h2>Public Watch Parties</h2>
+        <button
+          class="btn btn-secondary btn-small"
+          (click)="loadPublicWatchParties()"
+          [disabled]="isLoading()">
+          Refresh
+        </button>
+      </div>
+
+      <div class="parties-grid">
+        <div
+          *ngFor="let party of publicWatchParties()"
+          class="party-card"
+          [class.disabled]="isLoading()">
+          <div class="party-header">
+            <span class="party-code">{{ party.roomCode }}</span>
+            <span class="party-members">{{ party.memberCount }} members</span>
+          </div>
+          <div class="party-body">
+            <p class="party-creator">Created by {{ party.creatorUsername }}</p>
+            <p *ngIf="party.currentVideoTitle" class="party-video">
+              Watching: {{ party.currentVideoTitle }}
+            </p>
+          </div>
+          <button
+            class="btn btn-primary btn-small btn-full"
+            (click)="joinPublicParty(party.roomCode)"
+            [disabled]="isLoading()">
+            Join
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="publicWatchParties().length === 0" class="empty-state">
+      <p>No public watch parties available</p>
+      <p class="hint">Create one to get started!</p>
+    </div>
+  </div>
+</div>
