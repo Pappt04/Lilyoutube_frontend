@@ -17,6 +17,7 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
 
     hls: Hls | null = null;
     isScheduled = false;
+    isLiveStream = false;
     timeRemaining = '';
     private timerInterval: any;
     private playEventEmitted = false;
@@ -32,7 +33,6 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['videoUrl'] && !changes['videoUrl'].firstChange && isPlatformBrowser(this.platformId)) {
-            // Video URL changed - reinitialize the player with the new source
             if (this.hls) {
                 this.hls.destroy();
                 this.hls = null;
@@ -100,6 +100,17 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
         this.timeRemaining = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
 
+    /**
+     * Check if this is a scheduled stream that is currently live
+     * (scheduledStartTime is in the past = stream has started)
+     */
+    private isScheduledAndLive(): boolean {
+        if (!this.scheduledStartTime) return false;
+        const start = new Date(this.scheduledStartTime);
+        const now = new Date();
+        return now >= start;
+    }
+
     private initPlayer() {
         if (!isPlatformBrowser(this.platformId)) {
             return;
@@ -113,7 +124,6 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
 
         const video = this.videoElementRef.nativeElement;
 
-        // Add play event listener to emit play event
         video.addEventListener('play', () => {
             if (!this.playEventEmitted) {
                 this.playEventEmitted = true;
@@ -123,14 +133,51 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
         });
 
         if (Hls.isSupported()) {
-            this.hls = new Hls();
+            const isLive = this.isScheduledAndLive();
+
+            // Configure HLS.js differently for live scheduled streams vs regular VOD
+            const hlsConfig: Partial<Hls['config']> = isLive ? {
+                // Live stream: play close to the live edge (1 segment behind)
+                liveSyncDurationCount: 1,
+                liveMaxLatencyDurationCount: 3,
+                // Faster playlist reload for live simulation
+                levelLoadingMaxRetry: 4,
+                manifestLoadingMaxRetry: 4,
+            } : {};
+
+            this.hls = new Hls(hlsConfig);
             this.hls.loadSource(this.videoUrl);
             this.hls.attachMedia(video);
-            this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                // Auto-play could be restricted by browser policies
-                // video.play().catch(e => console.log('Autoplay prevented:', e));
+
+            this.hls.on(Hls.Events.MANIFEST_PARSED, (_event, data) => {
+                // HLS.js detects live from the absence of #EXT-X-ENDLIST
+                if (data.levels && data.levels.length > 0) {
+                    const level = data.levels[0];
+                    // Check if HLS.js detected this as a live stream
+                    if (level.details && !level.details.live && isLive) {
+                        console.log('Scheduled stream detected as VOD by HLS.js - stream may have ended');
+                    }
+                }
+
+                if (isLive) {
+                    this.isLiveStream = true;
+                    console.log('Live scheduled stream - HLS.js will sync to live edge');
+                }
             });
-            this.hls.on(Hls.Events.ERROR, (event, data) => {
+
+            // When level details are loaded, we can verify live status and seek
+            this.hls.on(Hls.Events.LEVEL_LOADED, (_event, data) => {
+                if (data.details.live && isLive) {
+                    this.isLiveStream = true;
+                    console.log('Confirmed live stream, live edge at:', data.details.totalduration);
+                } else if (!data.details.live && isLive) {
+                    // Stream ended (backend added #EXT-X-ENDLIST) - switch to VOD mode
+                    this.isLiveStream = false;
+                    console.log('Scheduled stream has ended, now VOD');
+                }
+            });
+
+            this.hls.on(Hls.Events.ERROR, (_event, data) => {
                 if (data.fatal) {
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
@@ -142,7 +189,6 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
                             this.hls?.recoverMediaError();
                             break;
                         default:
-                            // cannot recover
                             this.hls?.destroy();
                             break;
                     }
@@ -150,9 +196,6 @@ export class VideoPlayerComponent implements OnInit, OnChanges, OnDestroy, After
             });
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = this.videoUrl;
-            video.addEventListener('loadedmetadata', () => {
-                // video.play();
-            });
         }
     }
 }

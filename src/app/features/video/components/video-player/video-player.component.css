@@ -39,3 +39,23 @@
     margin: 1rem 0;
     color: #ff0000;
 }
+
+.live-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #CC0000;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 5;
+    animation: live-pulse 2s infinite;
+}
+
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
